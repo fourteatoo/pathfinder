@@ -31,25 +31,45 @@
                  [ring-transit "0.1.6"]
                  ;; for the Frontend (ClojureScript)
                  [org.clojure/clojurescript "1.12.145"]
+                 ;; newer reagent is incompatible (not backward
+                 ;; compatible)
                  [reagent "1.3.0"]
                  [thheller/shadow-cljs "3.4.12"]
                  [com.cognitect/transit-cljs "0.8.280"]
-                 [org.slf4j/slf4j-simple "2.0.13"]]
+                 [org.slf4j/slf4j-simple "2.0.18"]]
   :main ^:skip-aot fourteatoo.pathfinder.core
   :source-paths ["src/clj" "src/cljs"]
   :target-path "target/%s"
   :repl-options {:init-ns fourteatoo.pathfinder.core}
+  :plugins [[lein-cljsbuild "1.1.8"]]
+  :hooks [leiningen.cljsbuild]
   :aliases {"slides" ["with-profile" "dev" "run" "-m" "clojure.main" "-e"
                       "(require '[slides :as s]) (s/make-slides)"]
             "notebook" ["with-profile" "dev" "run" "-m" "clojure.main" "-e"
                         "(require '[notebook :as n]) (n/make-notebook)"]
             "build-docs" ["do" ["slides"] ["notebook"]]}
-
   :profiles {:uberjar {:aot :all
+                       :prep-tasks ["compile" ["cljsbuild" "once" "min"]]
                        :jvm-opts ["-Xmx2g"
                                   "-Dclojure.compiler.direct-linking=true"
                                   "-Djdk.attach.allowAttachSelf"]}
-             :dev {:dependencies [[org.scicloj/clay "2.0.20"]
-                                  [hiccup "2.0.0-RC5"]
+             :dev {:dependencies [[org.scicloj/clay "2.0.21"]
+                                  [hiccup "2.0.0"]
                                   [thheller/shadow-cljs "3.4.12" :exclusions [hiccup]]]
-                   :source-paths ["notebooks"]}})
+                   :source-paths ["notebooks"]}}
+  :cljsbuild {:builds
+              [{:id "dev"
+                :source-paths ["src/cljs"]
+                :compiler {:main          pathfinder.core
+                           :npm-deps      false      ;; Prevents shelling out to Node for module-deps
+                           :output-to     "target/public/js/app.js"       ;; Build output
+                           :output-dir    "target/public/js/out"          ;; Transient JS files
+                           :asset-path    "/js/out"}}                     ;; URL path browser requests
+               
+               {:id "min"
+                :source-paths ["src/cljs"]
+                :compiler {:main          pathfinder.core
+                           :npm-deps      false      ;; Prevents shelling out to Node for module-deps
+                           :output-to     "target/public/js/app.js"
+                           :optimizations :advanced
+                           :pretty-print  false}}]})
