@@ -4,6 +4,9 @@
   :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [[org.clojure/clojure "1.12.5"]
+                 ;; to avoid including an older version as transient
+                 ;; dependecy
+                 [prismatic/schema "1.4.2"]
                  [camel-snake-kebab "0.4.3"]
                  [scicloj/tablecloth "8.024"]
                  [org.scicloj/tableplot "1-beta17"]
