@@ -60,16 +60,18 @@
   :cljsbuild {:builds
               [{:id "dev"
                 :source-paths ["src/cljs"]
+                :resource-paths ["target/public"]
                 :compiler {:main          pathfinder.core
-                           :npm-deps      false      ;; Prevents shelling out to Node for module-deps
+                           ;; :npm-deps      false      ;; Prevents shelling out to Node for module-deps
                            :output-to     "target/public/js/app.js"       ;; Build output
                            :output-dir    "target/public/js/out"          ;; Transient JS files
                            :asset-path    "/js/out"}}                     ;; URL path browser requests
                
                {:id "min"
                 :source-paths ["src/cljs"]
+                :resource-paths ["target/public"]
                 :compiler {:main          pathfinder.core
-                           :npm-deps      false      ;; Prevents shelling out to Node for module-deps
+                           ;; :npm-deps      false      ;; Prevents shelling out to Node for module-deps
                            :output-to     "target/public/js/app.js"
                            :optimizations :advanced
                            :pretty-print  false}}]})
