@@ -24,11 +24,13 @@
                  [http-kit "2.9.0-beta4"]
                  [ring/ring-core "1.15.5"]
                  [ring/ring-codec "1.3.0"]
-                 [ring/ring-json "0.5.1"]
+                 #_[ring/ring-json "0.5.1"]
+                 [ring-transit "0.1.6"]
                  ;; for the Frontend (ClojureScript)
                  [org.clojure/clojurescript "1.12.145"]
                  [reagent "1.3.0"]
                  [thheller/shadow-cljs "3.4.12"]
+                 [com.cognitect/transit-cljs "0.8.280"]
                  [org.slf4j/slf4j-simple "2.0.13"]]
   :main ^:skip-aot fourteatoo.pathfinder.core
   :source-paths ["src/clj" "src/cljs"]

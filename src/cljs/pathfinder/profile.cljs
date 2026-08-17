@@ -3,7 +3,7 @@
             [clojure.string :as s]
             [reagent.core :as r]
             [pathfinder.state :refer [state]]
-            [pathfinder.util :refer [to-json]]))
+            [pathfinder.util :refer [encode-transit decode-transit]]))
 
 
 (defn select-city! [city-obj]
@@ -19,14 +19,14 @@
     (-> (js/fetch "/api/search-cities"
                   (clj->js
                    {:method "POST"
-                    :headers {"Content-Type" "application/json"}
-                    :body (to-json {:query query})}))
+                    ;; :headers {"Content-Type" "application/json"}
+                    :body (encode-transit {:query query})}))
         (.then (fn [res]
                  (if (.-ok res)
-                   (.json res)
+                   (.text res) #_(.json res)
                    (throw (js/Error. "City search failed")))))
-        (.then (fn [json-data]
-                 (let [results (js->clj json-data :keywordize-keys true)]
+        (.then (fn [data]
+                 (let [results (decode-transit data) #_(js->clj data :keywordize-keys true)]
                    (swap! state assoc :city-suggestions results))))
         (.catch (fn [err]
                   (js/console.error "City suggestion error:" err)
@@ -222,19 +222,21 @@
   (-> (js/fetch "/api/search-jobs"
                 (clj->js
                  {:method "POST"
-                  :headers {"Content-Type" "application/json"}
-                  :body (to-json
+                  ;; :headers {"Content-Type" "application/json"}
+                  :headers {"Content-Type" "application/transit+json"
+                            "Accept"       "application/transit+json"}
+                  :body (encode-transit
                          {:profile (:profile @state)
                           :location (:location @state)
                           :latitude (js/parseFloat (:latitude @state))
                           :longitude (js/parseFloat (:longitude @state))
-                          :geo_radius (js/parseInt (:geo-radius @state))})}))
+                          :geo-radius (js/parseInt (:geo-radius @state))})}))
       (.then (fn [res]
                (if (.-ok res)
-                 (.json res)
+                 (.text res) #_(.json res)
                  (throw (js/Error. (str "HTTP error " (.-status res)))))))
-      (.then (fn [json-data]
-               (let [jobs (js->clj json-data :keywordize-keys true)]
+      (.then (fn [data]
+               (let [jobs (decode-transit data) #_(js->clj data :keywordize-keys true)]
                  (swap! state assoc :jobs jobs :loading? false :active-tab :jobs))))
       (.catch (fn [err]
                 (js/console.error "Search failed:" err)

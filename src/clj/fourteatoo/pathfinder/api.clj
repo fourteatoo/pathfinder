@@ -2,12 +2,12 @@
   (:require [org.httpkit.server :as server]
             [ring.middleware.resource :refer [wrap-resource]]
             [ring.middleware.content-type :refer [wrap-content-type]]
-            [ring.middleware.json :refer [wrap-json-body wrap-json-response]]
+            #_[ring.middleware.json :refer [wrap-json-body wrap-json-response]]
+            [ring.middleware.transit :refer [wrap-transit-body wrap-transit-response]]
             [fourteatoo.pathfinder.search :as search]
             [fourteatoo.pathfinder.cv :as cv]
             [clojure.java.io :as io]
             [mount.core :as mount]
-            [cheshire.core :as json]
             [camel-snake-kebab.core :as csk]
             [fourteatoo.pathfinder.trends :as trends]
             [fourteatoo.pathfinder.cities :as cities]))
@@ -17,8 +17,8 @@
   (let [query (get-in req [:body :query] "")
         results (search/search-cities query)]
     {:status 200
-     :headers {"Content-Type" "application/json"}
-     :body (json/generate-string results)}))
+     :headers {"Content-Type" "application/edn"}
+     :body (pr-str results)}))
 
 (comment
   (search/search-cities "Milan"))
@@ -29,7 +29,7 @@
         latitude (:latitude body)
         longitude (:longitude body)
         country (cities/find-country-from-coords latitude longitude)
-        job-id  (parse-long (:job body))]
+        job-id  (:job body)]
     {:status 200
      :body (map #(trends/enrich-course-with-market-data % country)
                 (search/filter-recommendations-by-distance
@@ -42,12 +42,19 @@
         latitude (:latitude body)
         longitude (:longitude body)
         geo-radius (:geo-radius body)]
+    (prn 'body body)                    ; -wcp17/08/26
     {:status 200
-     :body (->> (search/search-jobs profile
-                                    :latitude latitude :longitude longitude
-                                    :geo-radius geo-radius)
-                ;; JS cannot handle BigInts
-                (map #(update % :job-id str)))}))
+     :body (search/search-jobs profile
+                               :latitude latitude :longitude longitude
+                               :geo-radius geo-radius)}))
+
+#_(->> 
+   ;; JS cannot handle BigInts
+   (map #(update % :job-id str)))
+
+(comment
+  (search/search-jobs {:name "Viktor Kovács", :summary "Embedded systems specialist with expertise in C/C++, RTOS, microcontroller firmware (ARM Cortex-M), and industrial automation protocols (CAN bus, Modb...", :skills ["C" "C++" "ARM Assembly" "FreeRTOS" "Embedded Linux" "CAN bus" "SPI/I2C" "GDB" "Python" "CMake"], :experience [{:company "AutoControl Automotive", :role "Principal Firmware Engineer", :years "2018 - Present", :bullets ["Developed ISO 26262 functional safety-compliant C firmware for automotive ECU controllers." "Optimized FreeRTOS task scheduling to guarantee deterministic response time under 1ms."], :id #uuid "82ac26f8-991a-45f8-aec6-334ea45677f7"} {:company "RoboTech Industrial", :role "Senior Embedded Engineer", :years "2012 - 2018", :bullets ["Built embedded Linux BSPs and device drivers for ARM-based robotic arms." "Implemented custom communication protocol over CAN bus."], :id #uuid "fe580509-ec77-4458-a0ed-ce3b4999c85a"} {:company "MicroDev Hungary", :role "Embedded Developer", :years "2008 - 2012", :bullets ["Programmed 8-bit and 32-bit microcontrollers in C for smart metering hardware."], :id #uuid "e418b2ff-4439-4725-846c-0f381d335b35"}]}
+                      :latitude 50.1106 :longitude 8.6822 :geo-radius 1000))
 
 (comment
   (search/search-cities "Frankfurt")
@@ -89,8 +96,8 @@
 
 (def app
   (-> api-routes
-      (wrap-json-body {:keywords true :key-fn csk/->kebab-case-keyword})
-      wrap-json-response
+      (wrap-transit-body {:keywords? true})
+      (wrap-transit-response {:encoding :json})
       (wrap-resource "public")
       wrap-content-type))
 

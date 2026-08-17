@@ -1,4 +1,6 @@
-(ns pathfinder.util)
+(ns pathfinder.util
+  (:require
+   [cognitect.transit :as t]))
 
 (defn- to-json [x]
   (js/JSON.stringify (clj->js x)))
@@ -63,3 +65,25 @@
             :stroke-width "1.5" :stroke "currentColor" :class "w-3 h-3"}
       [:path {:stroke-linecap "round" :stroke-linejoin "round" 
               :d "M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"}]]]))
+
+(defn- trend-icon [trend-kw]
+  (case trend-kw
+    :up   [:span {:style {:color "#16a34a" :margin-left "4px"}} "▲"]
+    :down [:span {:style {:color "#dc2626" :margin-left "4px"}} "▼"]
+    :flat [:span {:style {:color "#6b7280" :margin-left "4px"}} "●"]
+    ;; if it's garbage, print it out
+    trend-kw))
+
+(defn metric-badge [label value-fmt trend]
+  [:div.metric-container
+   [:span.metric-label label]
+   [:span.metric-value value-fmt]
+   [trend-icon trend]])
+
+(defn decode-transit [transit-string]
+  (let [r (t/reader :json)]
+    (t/read r transit-string)))
+
+(defn encode-transit [data]
+  (let [w (t/writer :json)]
+    (t/write w data)))

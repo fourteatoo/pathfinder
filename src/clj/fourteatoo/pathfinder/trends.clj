@@ -113,9 +113,11 @@
 
 
 (comment
-  (def survey-csv "../data/stackoverflow/survey2025.csv.xz")
+  (def survey-csv tech-survey-path)
   (analyze-year-file survey-csv 2025)
   (analyze-year-file "../data/stackoverflow/survey2023.csv.xz" 2023)
+  (analyze-year-file "../data/stackoverflow/survey2024.csv.xz" 2024)
+  (analyze-year-file "../data/stackoverflow/survey2025.csv.xz" 2025)
   (generate-three-year-trend
    "../data/stackoverflow/survey2023.csv.xz"
    "../data/stackoverflow/survey2024.csv.xz"
@@ -200,15 +202,44 @@
 
 (defn find-so-metric-for-skill [skill country]
   (->> (jdbc/execute "select * from trends where country = ?" country)
-       (some (fn [metric]
-               (when (skills-match? skill (:technology metric))
-                 metric)))))
+       (filter (fn [metric]
+                 (skills-match? skill (:technology metric))))))
 
 (comment
   (find-so-metric-for-skill "Python Programming" "Germany")
   (find-so-metric-for-skill "Hadoop" "Germany")
   (find-so-metric-for-skill "Spark" "Germany")
   (map :technology (jdbc/execute "select * from trends where country = ?" "Germany")))
+
+(defn- calculate-trend
+  "Computes a trend indicator string (\":up\", \":down\", or \":flat\")
+   given a sequence of time-ordered values (e.g., [val-23 val-24 val-25])
+   and a noise threshold standard."
+  [values threshold]
+  (if (< (count values) 2)
+    :flat
+    (let [v-first (first values)
+          v-last  (last values)
+          delta   (- v-last v-first)]
+      (cond
+        (> delta threshold)  :up
+        (< delta (- threshold)) :down
+        :else                :flat))))
+
+(defn- attach-skill-trends
+  "Given historical metric entries for a single skill across years (ordered by year),
+   extracts the latest year's (2025) figures and computes trend indicators."
+  [historical-skill-metrics threshold-map]
+  (when (seq historical-skill-metrics)
+    (let [sorted-metrics (sort-by :year historical-skill-metrics)
+          latest-metric  (last sorted-metrics)
+          salaries     (keep :median-salary sorted-metrics)
+          adoptions    (keep :adoption sorted-metrics)
+          desirabilities (keep :desirability sorted-metrics)]
+      (assoc latest-metric
+             :salary-trend       (calculate-trend salaries (get threshold-map :salary 1000.0))
+             :adoption-trend     (calculate-trend adoptions (get threshold-map :adoption 0.01))
+             :desirability-trend (calculate-trend desirabilities (get threshold-map :desirability 0.02))))))
 
 (defn- compute-weighted-salary
   "Calculates a headcount-weighted average median salary across matched skill metrics."
@@ -251,14 +282,62 @@
      :market-avg-desirability avg-desirability
      :skill-metrics matched-metrics}))
 
+
+(defn course-market-metrics-with-trends
+  [course country]
+  (let [skills (if (string? (:gained-skills course))
+                 (clojure.string/split (:gained-skills course) #",")
+                 (:gained-skills course))
+        trimmed-skills (map clojure.string/trim skills)
+        skill-histories (for [s trimmed-skills
+                              :let [history (find-so-metric-for-skill s country)]
+                              :when (seq history)]
+                          {:course-skill s
+                           :history      history})
+        matched-metrics (keep (fn [{:keys [course-skill history]}]
+                                (when-let [processed (attach-skill-trends history {:salary 1000.0 :adoption 0.005 :desirability 0.02})]
+                                  (assoc processed :skill course-skill)))
+                              skill-histories)]
+    (when (seq matched-metrics)
+      (let [avg-salary       (compute-weighted-salary matched-metrics)
+            avg-adoption     (/ (reduce + (map :adoption matched-metrics)) (count matched-metrics))
+            avg-desirability (/ (reduce + (map :desirability matched-metrics)) (count matched-metrics))
+            all-histories (map :history skill-histories)
+            available-years (->> all-histories
+                                 (mapcat #(map :year %))
+                                 distinct
+                                 sort)
+            yearly-averages (for [y available-years]
+                              (let [y-metrics (keep (fn [h] (first (filter #(= (:year %) y) h))) all-histories)]
+                                {:year         y
+                                 :salary       (when (seq y-metrics)
+                                                 (/ (reduce + (map :median-salary y-metrics)) (count y-metrics)))
+                                 :adoption     (when (seq y-metrics)
+                                                 (/ (reduce + (map :adoption y-metrics)) (count y-metrics)))
+                                 :desirability (when (seq y-metrics)
+                                                 (/ (reduce + (map :desirability y-metrics)) (count y-metrics)))}))
+            
+            yearly-salaries     (keep :salary yearly-averages)
+            yearly-adoptions    (keep :adoption yearly-averages)
+            yearly-desirabilities (keep :desirability yearly-averages)]
+        
+        {:market-avg-salary       avg-salary
+         :market-avg-adoption     avg-adoption
+         :market-avg-desirability avg-desirability
+         :salary-trend            (calculate-trend yearly-salaries 1000.0)
+         :adoption-trend          (calculate-trend yearly-adoptions 0.005)
+         :desirability-trend      (calculate-trend yearly-desirabilities 0.02)
+         :skill-metrics           matched-metrics}))))
+
 (comment
   (def c (jdbc/execute-one  "select * from courses where title = ? limit 1"
                             "NoSQL, Big Data, and Spark Foundations Specialization"))
-  (course-market-metrics c "Germany"))
+  (jdbc/execute "select * from trends where technology = ? and country = ?" "Python" "Germany")
+  (course-market-metrics-with-trends c "Germany"))
 
 (defn enrich-course-with-market-data [course country]
   (merge course
-         (course-market-metrics course country)))
+         (course-market-metrics-with-trends course country)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -346,7 +425,7 @@
   (delay
     (build-so->coords-lookup
      (all-countries-in-so-ds
-      (load/load-dataset "../data/stackoverflow/survey2025.csv.xz"
+      (load/load-dataset tech-survey-path
                          {:column-whitelist ["Country"]
                           :key-fn csk/->kebab-case-keyword}))
      (cities/country-centroids-from-simplemaps

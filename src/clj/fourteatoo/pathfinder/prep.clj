@@ -32,7 +32,9 @@
   ;; (courses/load-courses courses/courses-path)
   (courses/load-courses2 courses/courses2-path)
   (println "loading trends")
-  (trends/load-trends trends/tech-survey-path 2025))
+  (trends/load-trends "../data/stackoverflow/survey2023.csv.xz" 2023)
+  (trends/load-trends "../data/stackoverflow/survey2024.csv.xz" 2024)
+  (trends/load-trends "../data/stackoverflow/survey2025.csv.xz" 2025))
 
 (comment
   (bootstrap-db))

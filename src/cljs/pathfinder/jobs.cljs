@@ -1,6 +1,6 @@
 (ns pathfinder.jobs
   (:require [pathfinder.state :refer [state]]
-            [pathfinder.util :as util :refer [to-json]]))
+            [pathfinder.util :as util :refer [encode-transit decode-transit]]))
 
 
 (defn tailor-cv! [job]
@@ -9,16 +9,18 @@
     (-> (js/fetch "/api/tailor-cv"
                   (clj->js
                    {:method "POST"
-                    :headers {"Content-Type" "application/json"}
-                    :body (to-json
+                    ;; :headers {"Content-Type" "application/json"}
+                    :headers {"Content-Type" "application/transit+json"
+                              "Accept"       "application/transit+json"}
+                    :body (encode-transit
                            {:cv (:profile @state)
                             :job job-id})}))
         (.then (fn [res]
                  (if (.-ok res)
-                   (.json res)
+                   (.text res) #_(.json res)
                    (throw (js/Error. (str "Tailoring failed: " (.-status res)))))))
-        (.then (fn [json-data]
-                 (let [result (js->clj json-data :keywordize-keys true)
+        (.then (fn [data]
+                 (let [result (decode-transit data) #_(js->clj data :keywordize-keys true)
                        tailored-text (or (:tailored-cv result) (:cv result) (pr-str result))]
                    (swap! state assoc-in [:tailored-cvs job-id] tailored-text)
                    (swap! state assoc :tailoring-job-id nil))))
@@ -32,18 +34,20 @@
   (-> (js/fetch "/api/recommend-courses"
                 (clj->js
                  {:method "POST"
-                  :headers {"Content-Type" "application/json"}
-                  :body (to-json {:job (:job-id job)
-                                  :profile (:profile @state)
-                                  ;; these are for the trend stats
-                                  :latitude (:latitude @state)
-                                  :longitude (:longitude @state)})}))
+                  ;; :headers {"Content-Type" "application/json"}
+                  :headers {"Content-Type" "application/transit+json"
+                            "Accept"       "application/transit+json"}
+                  :body (encode-transit {:job (:job-id job)
+                                         :profile (:profile @state)
+                                         ;; these are for the trend stats
+                                         :latitude (:latitude @state)
+                                         :longitude (:longitude @state)})}))
       (.then (fn [res]
                (if (.-ok res)
-                 (.json res)
+                 (.text res) #_(.json res)
                  (throw (js/Error. (str "Course recommendation error: " (.-status res)))))))
-      (.then (fn [json-data]
-               (let [courses (js->clj json-data :keywordize-keys true)]
+      (.then (fn [data]
+               (let [courses (decode-transit data) #_(js->clj data :keywordize-keys true)]
                  (swap! state assoc 
                         :recommended-courses courses 
                         :courses-loading? false 

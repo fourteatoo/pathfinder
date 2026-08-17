@@ -2,7 +2,7 @@
   (:require [reagent.core :as r]
             [clojure.string :as s]
             [pathfinder.state :refer [state]]
-            [pathfinder.util :as util :refer [to-json]]
+            [pathfinder.util :as util :refer [encode-transit decode-transit]]
             [clojure.set :as set]))
 
 ;; --- API CALL HELPER ---
@@ -10,15 +10,18 @@
   (swap! state assoc :courses-loading? true)
   (-> (js/fetch "/api/recommend-courses"
                 (clj->js {:method "POST"
-                          :headers {"Content-Type" "application/json"}
-                          :body (to-json {:profile (:profile @state)
-                                          :job job-id
-                                          ;; these are for the trend stats
-                                          :latitude (:latitude @state)
-                                          :longitude (:longitude @state)})}))
-      (.then #(.json %))
-      (.then (fn [json-data]
-               (let [courses (js->clj json-data :keywordize-keys true)]
+                          ;; :headers {"Content-Type" "application/json"}
+                          :headers {"Content-Type" "application/transit+json"
+                                    "Accept"       "application/transit+json"}
+                          :body (encode-transit {:profile (:profile @state)
+                                                 :job job-id
+                                                 ;; these are for the trend stats
+                                                 :latitude (:latitude @state)
+                                                 :longitude (:longitude @state)})}))
+      #_(.then #(.json %))
+      (.then #(.text %))
+      (.then (fn [data]
+               (let [courses (decode-transit data)] #_[courses (js->clj data :keywordize-keys true)]
                  (swap! state assoc 
                         :recommended-courses courses 
                         :courses-loading? false
@@ -63,9 +66,11 @@
   (let [skill-name   (if (map? item) (:skill item) item)
         metric       (when (map? item) (or (:metric item) item))
         salary       (:median-salary metric)
+        salary-trend (:salary-trend metric)
         appeal       (:desirability metric)
+        appeal-trend (:desirability-trend metric)
         adoption     (:adoption metric)
-        
+        adoption-trend (:adoption-trend metric)
         highly-usable? (and adoption (> adoption 0.5))
         cool?          (and appeal (> appeal 0.8))]
     [:div {:class "flex items-center text-xs py-1.5 gap-2"}
@@ -86,21 +91,25 @@
         [:span {:class (str (if cool? "text-warning font-semibold" "opacity-70") 
                             " tooltip tooltip-left cursor-help")
                 :data-tip "Developer interest ratio (Want vs Have)"}
-         (str "Appeal: " (format-ratio appeal))])
+         #_(str "Appeal: " (format-ratio appeal))
+         (util/metric-badge "Appeal: " (format-ratio appeal) appeal-trend)])
       
       (when adoption
         [:span {:class (str (if highly-usable? "text-info font-semibold" "opacity-70") 
                             " tooltip tooltip-left cursor-help")
                 :data-tip "Percentage of professional developers using this tech"}
-         (str "Adoption: " (format-ratio adoption))])
+         #_(str "Adoption: " (format-ratio adoption))
+         (util/metric-badge "Adoption: " (format-ratio adoption) adoption-trend)])
       
       (when salary
         [:span {:class "text-success font-semibold min-w-[55px]"}
-         (format-currency salary)])]]))
+         (util/metric-badge "" (format-currency salary) salary-trend)
+         #_(format-currency salary)])]]))
 
 (defn course-skills-toggle-list
-  "Renders compact badges by default. Clicking the area replaces it inline with 
-   a full scrollable list of localized metrics. Clicking again collapses it back."
+  "Renders compact badges by default. Clicking the area replaces it
+  inline with a full scrollable list of localized metrics. Clicking
+  again collapses it back."
   [skill-metrics & {:keys [max-visible max-salary avg-desirability] :or {max-visible 5}}]
   (r/with-let [expanded? (r/atom false)]
     (when (seq skill-metrics)
@@ -108,25 +117,20 @@
             visible      (take max-visible skill-metrics)
             hidden-count (- total-count max-visible)]
         [:div {:class "pt-2"}
-         
-         ;; --- HEADER & TOP-LEVEL AGGREGATES ---
          [:div {:class "flex justify-between items-center mb-1.5 gap-2"}
           [:p {:class "text-xs font-semibold text-base-content/60"}
            (if @expanded?
              "Skills & Local Market Metrics (click to collapse):"
              "Skills Taught (click to view market metrics):")]
-
           [:div {:class "flex items-center gap-3 ml-auto"}
-           ;; Overall Course Aggregates (Flush Right)
+           ;; Overall Course Aggregates
            (when (and max-salary (not @expanded?))
              [:span {:class "text-xs font-semibold text-success"}
               (str "Top: " (format-currency max-salary))])
-           
            (when (and avg-desirability (not @expanded?))
              [:span {:class "text-xs opacity-70 tooltip tooltip-left cursor-help"
                      :data-tip "Average market desirability index across course skills"}
               (str "Avg Des: " (format-ratio avg-desirability))])
-
            ;; Expand / Collapse Button
            (when (or (pos? hidden-count) @expanded?)
              [:button {:class "btn btn-ghost btn-xs text-xs text-primary p-0 h-auto min-h-0"
@@ -136,7 +140,7 @@
               (if @expanded? "Collapse" (str "+" hidden-count " more"))])]]
 
          (if-not @expanded?
-           ;; --- COMPACT VIEW (SHOWS ALL VISIBLE SKILLS) ---
+           ;; Compact view
            [:div {:class "flex flex-wrap gap-1.5 items-center cursor-pointer group"
                   :on-click #(reset! expanded? true)}
             (for [item visible]
@@ -149,7 +153,7 @@
               [:span {:class "badge badge-neutral text-xs group-hover:badge-primary transition-colors"} 
                (str "+" hidden-count " more")])]
 
-           ;; --- DETAILED INLINE EXPANDED VIEW ---
+           ;; Detailed View
            [:div {:class "bg-base-200/60 rounded-box p-3 border border-base-300 space-y-1.5 max-h-64 overflow-y-auto cursor-pointer"
                   :on-click #(reset! expanded? false)}
             (for [item skill-metrics]
