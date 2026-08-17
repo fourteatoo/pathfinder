@@ -3,18 +3,37 @@
 
 (defonce state
   (r/atom {:active-tab :profile   ;; :profile | :jobs | :courses
-           :cv-text ""
-           :cv-edn {:name "John Doe"
-                    :location "Paris, Texas, USA"
-                    :skills ["Python" "DuckDB" "Systems Programming" "FreeBSD"]
-                    :experience [{:company "Tech Corp Ltd"
-                                  :role "Senior Backend & Systems Engineer"
-                                  :years "2018 - 2025"
-                                  :bullets ["Built high-performance Clojure services"
-                                            "Managed system logs and PostgreSQL/DuckDB pipelines"]}]}
+
+           ;; Structured Profile Map
+           :profile {:name "Your Name"
+                     :summary "Your profile summary"
+                     :skills ["skill1" "skill2" "skill3" "skill4"]
+                     :experience [{:company "Big Corp Ltd"
+                                   :role "Senior Software Engineer"
+                                   :years "2017 - 2024"
+                                   :bullets ["Built high-performance financial data conversion pipelines."
+                                             "Maintained backend systems and databases."]}
+                                  {:company "WBS Coding School"
+                                   :role "Data Science Student"
+                                   :years "2026"
+                                   :bullets ["Learned Python data analysis and machine learning workflows."
+                                             "Constructed Python pipelines for analytics dashboards."]}]}
+
+           :location "Frankfurt, Germany"
+           :latitude 50.1106
+           :longitude 8.6822
+           :geo-radius 50
+
+           ;; jobs pane
            :jobs []
-           :selected-job nil
-           :tailored-cv nil
            :loading? false
+           :selected-job nil
+
+           ;; :tailored-cv nil
+           :tailored-cvs {}        ;; Map of {job-id "tailored text..."}
+           :tailoring-job-id nil
+           
            :recommended-courses []
-           :courses-loading? false}))
+           :courses-loading? false
+
+           :city-suggestions []}))

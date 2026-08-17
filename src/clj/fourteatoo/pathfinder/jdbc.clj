@@ -71,6 +71,9 @@
 (defn execute [statement & parameters]
   (jdbc/execute! (db-conn) (cons statement parameters) jdbc/unqualified-snake-kebab-opts))
 
+(defn execute-one [statement & parameters]
+  (jdbc/execute-one! (db-conn) (cons statement parameters) jdbc/unqualified-snake-kebab-opts))
+
 (defn setup-vss []
   (execute "INSTALL vss;")
   (execute "LOAD vss;")
@@ -78,6 +81,11 @@
   (execute "LOAD spatial;"))
 
 (comment (setup-vss))
+
+;; define vss a separate state to avoid recursive dependency with
+;; db-pool
+(mount/defstate vss
+  :start (setup-vss))
 
 (defn execute-batch
   ([statement parameter-groups]
@@ -288,24 +296,5 @@
   (count (eduction (map :job-id)))
   (count (read-all-job-descriptions)))
 
-
-(comment
-  (defn save-dataset-to-db!
-    "Saves a Tablecloth dataset to a relational database table.
-   Creates the table based on column types if it does not exist."
-    [ds table-name db-spec]
-    ;; Open connection with auto-commit false for faster batch insertion
-    (with-open [conn (jdbc/get-connection db-spec {:auto-commit false})]
-      
-      ;; Sanitize dataset column names (e.g. kebab-case -> snake_case) and attach table name
-      (let [sql-ds (-> ds
-                       (tc/set-dataset-name (name table-name))
-                       (ds-sql/sanitize-dataset-names-for-sql))]
-        (ds-sql/ensure-table! (jdbc/db-conn) sql-ds)
-        (ds-sql/insert-dataset! conn sql-ds)
-
-        (.commit conn))))
-
-  ;; Usage:
-  (save-dataset-to-db! my-dataset "users" db-spec))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

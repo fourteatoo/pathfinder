@@ -5,16 +5,18 @@
             [pathfinder.navbar :refer [navbar]]
             [pathfinder.profile :refer [profile-tab]]
             [pathfinder.jobs :refer [jobs-tab]]
-            [pathfinder.courses :refer [courses-tab]]))
+            [pathfinder.courses :refer [courses-tab]]
+            [pathfinder.util :as util]))
 
 ;; --- MAIN LAYOUT SWITCH ---
 (defn main-app []
   [:div {:class "min-h-screen bg-base-200"}
+   [util/mascot-overlay]
    [navbar]
    (case (:active-tab @state)
      :profile [profile-tab]
      :jobs    [jobs-tab]
-     :courses [courses-tab state]
+     :courses [courses-tab]
      [profile-tab])])
 
 ;; --- REAGENT 1.3 MOUNT LIFECYCLE ---

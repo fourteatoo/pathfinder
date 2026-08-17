@@ -7,6 +7,12 @@
             [mount.core :as mount]))
 
 
+;; Alternative in emergency "llama-3.1-8b-instant"
+;; The old retired one was "llama-3.3-70b-versatile"
+(def groq-default-model "openai/gpt-oss-120b")
+(def groq-api-url "https://api.groq.com/openai/v1/chat/completions")
+(dh/defratelimiter groq-rl {:rate 1})
+
 (defn api-key []
   (c/conf :groq-api-key))
 
@@ -29,10 +35,6 @@
 
 ### TAILORED CV (MARKDOWN):"))
 
-(def groq-api-url "https://api.groq.com/openai/v1/chat/completions")
-
-(dh/defratelimiter groq-rl {:rate 1})
-
 (defn groq-complete [payload]
   (let [request-opts {:headers {"Authorization" (str "Bearer " (api-key))
                                 "Content-Type"  "application/json"}
@@ -50,9 +52,11 @@
   "Send the CV EDN and Job EDN to Groq and return a tailored Markdown CV."
   [cv-edn job-edn]
   (let [prompt (build-cv-tailoring-prompt cv-edn job-edn)
-        payload {:model "llama-3.3-70b-versatile"
+        payload {:model (or (c/conf :groq :model)
+                            groq-default-model)
                  ;; Low temperature is critical to prevent hallucinations
-                 :temperature 0.1 
+                 :temperature (or (c/conf :groq :temperature) 0.1)
+                 ;; :reasoning_format "hidden"
                  :messages [{:role "system"
                              :content "You are a professional, accurate resume editor. You strictly adhere to input facts."}
                             {:role "user"
