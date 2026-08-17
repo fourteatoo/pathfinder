@@ -1,6 +1,7 @@
 (ns fourteatoo.pathfinder.api
   (:require [org.httpkit.server :as server]
             [ring.middleware.resource :refer [wrap-resource]]
+            [ring.middleware.file :refer [wrap-file]]
             [ring.middleware.content-type :refer [wrap-content-type]]
             #_[ring.middleware.json :refer [wrap-json-body wrap-json-response]]
             [ring.middleware.transit :refer [wrap-transit-body wrap-transit-response]]
@@ -42,7 +43,6 @@
         latitude (:latitude body)
         longitude (:longitude body)
         geo-radius (:geo-radius body)]
-    (prn 'body body)                    ; -wcp17/08/26
     {:status 200
      :body (search/search-jobs profile
                                :latitude latitude :longitude longitude
@@ -94,6 +94,7 @@
   (-> api-routes
       (wrap-transit-body {:keywords? true})
       (wrap-transit-response {:encoding :json})
+      (wrap-file "target/public")
       (wrap-resource "public")
       wrap-content-type))
 
