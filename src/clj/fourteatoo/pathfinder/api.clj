@@ -94,7 +94,6 @@
   (-> api-routes
       (wrap-transit-body {:keywords? true})
       (wrap-transit-response {:encoding :json})
-      (wrap-file "target/public")
       (wrap-resource "public")
       wrap-content-type))
 
