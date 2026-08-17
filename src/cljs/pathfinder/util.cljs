@@ -71,8 +71,8 @@
     :up   [:span {:style {:color "#16a34a" :margin-left "4px"}} "▲"]
     :down [:span {:style {:color "#dc2626" :margin-left "4px"}} "▼"]
     :flat [:span {:style {:color "#6b7280" :margin-left "4px"}} "●"]
-    ;; if it's garbage, print it out
-    trend-kw))
+    ;; if it's garbage, point it out
+    [:span {:style {:color "#ff0000" :margin-left "4px"}} "?"]))
 
 (defn metric-badge [label value-fmt trend]
   [:div.metric-container

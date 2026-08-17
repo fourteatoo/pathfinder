@@ -173,14 +173,16 @@
                {:skill skill}))
          all-skills)))
 
-(defn stat-gauge
+(defn- stat-gauge
   "Renders a compact label + progress bar pair."
-  [{:keys [label value-str pct color-class] :or {color-class "progress-info"}}]
+  [{:keys [label value-str pct color-class trend] :or {color-class "progress-info"}}]
   [:div {:class "space-y-0.5"}
    [:div {:class "flex justify-between text-xs font-bold leading-tight"}
     [:span label]
     [:span {:class (if (= color-class "progress-success") "text-success" "text-info")} 
-     (or value-str (str pct "%"))]]
+     (or value-str (str pct "%"))
+     (when trend
+      (util/trend-icon trend))]]
    (when pct
      [:progress {:class (str "progress " color-class " w-full h-1.5 block") 
                  :value pct 
@@ -295,8 +297,8 @@
 
                  ;; Right Column: Relevance & Gap Gauges
                  [:div {:class "w-full md:w-64 bg-base-200 p-4 rounded-box space-y-2.5 shrink-0"}
-                  [stat-gauge {:label "Job Relevance"  :pct job-relevance   :color-class "progress-success"}]
-                  [stat-gauge {:label "Skill Gap"      :pct cv-gap}]
-                  [stat-gauge {:label "Market Adoption":pct market-adoption}]
-                  [stat-gauge {:label "Appeal"         :pct appeal}]
-                  [stat-gauge {:label "Salary Exp"     :value-str avg-salary}]]]]))])])]))
+                  [stat-gauge {:label "Job Relevance" :pct job-relevance :color-class "progress-success"}]
+                  [stat-gauge {:label "Skill Gap" :pct cv-gap}]
+                  [stat-gauge {:label "Market Adoption":pct market-adoption :trend (:adoption-trend course)}]
+                  [stat-gauge {:label "Appeal" :pct appeal :trend (:desirability-trend course)}]
+                  [stat-gauge {:label "Salary Exp" :value-str avg-salary :trend (:salary-trend course)}]]]]))])])]))
