@@ -45,6 +45,7 @@
   (mount/stop)
   (System/exit 0))
 
+
 ^:kindly/hide-code
 (defn start-clay-interactively []
   (clay/start! {:source-path *file*
@@ -293,7 +294,8 @@
 (trends/plot-trends
  (tc/select-rows @trends/trends-ds
                  (fn [row]
-                   (and (> (:have-count row) 400)
+                   (and (= (:year row) 2025)
+                        (> (:have-count row) 400)
                         (= "Germany" (:country row))))))
 
 ;; ## For USA:
@@ -302,7 +304,8 @@
 (trends/plot-trends
  (tc/select-rows @trends/trends-ds
                  (fn [row]
-                   (and (> (:have-count row) 900)
+                   (and (= (:year row) 2025)
+                        (> (:have-count row) 900)
                         (= "United States of America" (:country row))))))
 
 ;; 
