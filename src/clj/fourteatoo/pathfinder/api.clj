@@ -53,10 +53,6 @@
    (map #(update % :job-id str)))
 
 (comment
-  (search/search-jobs {:name "Viktor Kovács", :summary "Embedded systems specialist with expertise in C/C++, RTOS, microcontroller firmware (ARM Cortex-M), and industrial automation protocols (CAN bus, Modb...", :skills ["C" "C++" "ARM Assembly" "FreeRTOS" "Embedded Linux" "CAN bus" "SPI/I2C" "GDB" "Python" "CMake"], :experience [{:company "AutoControl Automotive", :role "Principal Firmware Engineer", :years "2018 - Present", :bullets ["Developed ISO 26262 functional safety-compliant C firmware for automotive ECU controllers." "Optimized FreeRTOS task scheduling to guarantee deterministic response time under 1ms."], :id #uuid "82ac26f8-991a-45f8-aec6-334ea45677f7"} {:company "RoboTech Industrial", :role "Senior Embedded Engineer", :years "2012 - 2018", :bullets ["Built embedded Linux BSPs and device drivers for ARM-based robotic arms." "Implemented custom communication protocol over CAN bus."], :id #uuid "fe580509-ec77-4458-a0ed-ce3b4999c85a"} {:company "MicroDev Hungary", :role "Embedded Developer", :years "2008 - 2012", :bullets ["Programmed 8-bit and 32-bit microcontrollers in C for smart metering hardware."], :id #uuid "e418b2ff-4439-4725-846c-0f381d335b35"}]}
-                      :latitude 50.1106 :longitude 8.6822 :geo-radius 1000))
-
-(comment
   (search/search-cities "Frankfurt")
   (search/search-jobs "python developer" :latitude 50.1106 :longitude 8.6822 :geo-radius 500))
 
