@@ -1,13 +1,11 @@
 ^:kindly/hide-code
 (ns notebook
-  {:clay {:quarto-target-path "docs"
+  {:clay {:quarto-target-path "docs/notebook"
           :quarto {:format {:revealjs {:theme "default"
-                                       :slide-number true}
-                            }}
-          ;; :in-memory false
-          ;; :serve? false
+                                       :slide-number true}}}
           :browse false
           :live-reload false
+          :title "Pathfinder Notebook"
           :show false}}
   (:require
    [fourteatoo.pathfinder.jdbc :as jdbc]
@@ -25,20 +23,18 @@
 
 
 ^:kindly/hide-code
-(comment
-  ;; Thoughout the notebook we use stuff that needs the DB. And we do so
-  ;; at load time!  So all the namespaces need to be intitialised now.
-  )
-^:kindly/hide-code ^:kindly/hide-value
-(mount/start)
+(def started
+  ;; Throughout the notebook we use stuff that needs the DB. And we do
+  ;; so at load time!  So all the namespaces need to be intitialised
+  ;; now.  This definition in itself doesn't serve other purpose than
+  ;; hiding the code and its returned value from the output notbook.
+  (mount/start))
 
 ^:kindly/hide-code
 (defn make-notebook []
   ;; this function can be called by leiningen
   (clay/make! {:source-path "notebooks/notebook.clj"
                :add-to-buffer false
-               ;; :in-memory false
-               ;; :serve? false
                :browse false
                :live-reload false
                :show false})
@@ -124,7 +120,12 @@
     (jdbc/execute-one (str "select count(*) from " table)))))
 
 ;;; # Career Pathfinder Engine PoC
-
+;;
+;;
+;; This is the companion notebook to the Pathfinder app.  It is meant
+;; to give some insights about the nature and shape of the data and
+;; give some cluse about the design decisions that have been taken
+;; along the way.
 
 ^:kindly/hide-code
 (kind/image "resources/public/images/boyscout.png")
@@ -146,7 +147,8 @@
 (ds-info jobs)
 
 ;; here is an example
-(tc/random jobs 5)
+(-> (tc/random jobs 5)
+    (tc/drop-columns [:job-summary]))
 
 ;; The jobs contain synthetic data that doesn't always make much
 ;; sense for our specific presentation:
@@ -228,7 +230,8 @@
                         desc))))
 
 ;; The job offers have been relocated.  That is, they have been
-;; assigned a major European city based on its population.
+;; assigned a major European city according to its population.  This
+;; gives predicatble distribution across familiar places.
 
 (-> (jdbc/execute "select location,latitude,longitude from jobs")
     tc/dataset
@@ -243,8 +246,9 @@
     (tc/drop-columns [:embedding]))
 
 ;; The technology trends is a distillation of the StackOverflow survey
-;; data.  Once reduced to it's bare essentials it can be kept in a
-;; tablecloth dataset
+;; data.  Once reduced to it's bare essentials it isn't that unwieldy
+;; any more.
+
 
 (ds-info @trends/trends-ds)
 
