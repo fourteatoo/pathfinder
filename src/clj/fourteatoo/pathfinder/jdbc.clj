@@ -1,16 +1,14 @@
 (ns fourteatoo.pathfinder.jdbc
   (:require
    [clojure.string :as s]
+   [mount.core :as mount]
    [next.jdbc :as jdbc]
+   [next.jdbc.connection :as connection]
    [next.jdbc.prepare :as prepare]
    [next.jdbc.result-set :as rs]
-   [next.jdbc.sql :as sql]
-   [tablecloth.api :as tc]
-   [next.jdbc.connection :as connection]
-   [tech.v3.dataset.sql :as ds-sql]
-   [mount.core :as mount])
-  (:import [com.zaxxer.hikari HikariDataSource]))
-
+   [tablecloth.api :as tc])
+  (:import
+   (com.zaxxer.hikari HikariDataSource)))
 
 (def duckdb-path "../data/embeddings.duckdb.jdbc")
 
