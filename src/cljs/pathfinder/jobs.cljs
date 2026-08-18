@@ -110,14 +110,14 @@
            [:span {:class "badge badge-ghost badge-outline badge-sm"} skill])]])
 
      ;; Description
-     [:p {:class "text-sm whitespace-pre-line text-base-content/80 line-clamp-6 hover:line-clamp-none transition-all cursor-pointer"}
+     [:div {:class "text-sm whitespace-pre-line text-base-content/80 max-h-48 overflow-y-auto pr-2 border-l-2 border-base-300 pl-3"}
       (:description job)]
 
      ;; Action Buttons
      [:div {:class "flex gap-2 justify-end pt-2 border-t border-base-200"}
       [:button {:class "btn btn-outline btn-sm"
                 :on-click #(fetch-course-recommendations! job)}
-       "Find Skills & Courses"]
+       "Find Courses"]
 
       [:button {:class "btn btn-primary btn-sm"
                 :on-click #(tailor-cv! job)
@@ -140,7 +140,7 @@
 (defn jobs-tab []
   (let [jobs (:jobs @state)]
     [:div {:class "max-w-4xl mx-auto p-6 space-y-4"}
-     [:h2 {:class "text-2xl font-bold mb-4"} "Job Search Results"]
+     [:h2 {:class "text-2xl font-bold mb-4"} "🔍  Job Search Results"]
      (if (seq jobs)
        (for [j jobs]
          ^{:key (or (:job-id j) (:job-title j))} [job-card j])

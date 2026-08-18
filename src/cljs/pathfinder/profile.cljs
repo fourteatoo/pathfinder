@@ -325,4 +325,4 @@
                  :disabled (:loading? @state)}
         (if (:loading? @state)
           [:span {:class "loading loading-spinner"} "Searching..."]
-          "Save Profile & Search Jobs →")]]]]))
+          "🔍 Search Jobs →")]]]]))

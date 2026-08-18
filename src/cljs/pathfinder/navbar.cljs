@@ -5,7 +5,7 @@
   (let [curr-tab (:active-tab @state)]
     [:div {:class "navbar bg-base-100 shadow-lg px-6"}
      [:div {:class "flex-1"}
-      [:a {:class "btn btn-ghost text-xl font-bold"} "⚡ Pathfinder Job Engine"]]
+      [:a {:class "btn btn-ghost text-xl font-bold"} "🧭  Pathfinder Career Explorer"]]
      [:div {:class "flex-none"}
       [:div {:class "tabs tabs-boxed"}
        [:a {:class (str "tab " (when (= curr-tab :profile) "tab-active"))
