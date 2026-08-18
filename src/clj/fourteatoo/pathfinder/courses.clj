@@ -1,16 +1,20 @@
 (ns fourteatoo.pathfinder.courses
-  (:require [fourteatoo.pathfinder.load :as load]
-            [tablecloth.api :as tc]
-            [fourteatoo.pathfinder.search :as search]
-            [fourteatoo.pathfinder.jdbc :as jdbc]
-            [fourteatoo.pathfinder.util :as util]
-            [clojure.string :as s]
-            [clojure.set :as set]))
+  (:require
+   [clojure.string :as s]
+   [fourteatoo.pathfinder.config :as c]
+   [fourteatoo.pathfinder.jdbc :as jdbc]
+   [fourteatoo.pathfinder.load :as load]
+   [fourteatoo.pathfinder.search :as search]
+   [fourteatoo.pathfinder.util :as util]
+   [tablecloth.api :as tc]))
 
 
-(def courses-path "../data/Coursera.csv")
-(def courses2-path
+(def default-courses-path
   "../data/Coursera_Data.csv")
+
+(defn courses-path []
+  (or (c/conf :datasets :courses)
+      default-courses-path))
 
 (defn format-course-for-embedding [row]
   (str "Course: " (:title row)

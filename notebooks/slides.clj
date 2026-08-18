@@ -225,7 +225,7 @@
 ^:kindly/hide-code
 (trends/plot-survey-geo-distribution
  (trends/join-so-data-with-centroids
-  (trends/extract-country-overview trends/tech-survey-path)))
+  (trends/extract-country-overview (trends/tech-survey-path))))
 
 ;; # Architecture diagrams
 ;;

@@ -6,16 +6,20 @@
    [next.jdbc.connection :as connection]
    [next.jdbc.prepare :as prepare]
    [next.jdbc.result-set :as rs]
-   [tablecloth.api :as tc])
+   [tablecloth.api :as tc]
+   [fourteatoo.pathfinder.config :as c])
   (:import
    (com.zaxxer.hikari HikariDataSource)))
 
-(def duckdb-path "../data/embeddings.duckdb.jdbc")
+(def default-duckdb-path "../data/embeddings.duckdb.jdbc")
 
-(def ^:private db-spec {:dbtype "duckdb" :dbname duckdb-path})
+(defn db-spec []
+  {:dbtype "duckdb"
+   :dbname (or (c/conf :duckdb :path)
+               default-duckdb-path)})
 
 (mount/defstate db-pool
-  :start (connection/->pool HikariDataSource db-spec))
+  :start (connection/->pool HikariDataSource (db-spec)))
 
 (defn- db-conn []
   db-pool)

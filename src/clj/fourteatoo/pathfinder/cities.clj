@@ -3,10 +3,16 @@
             [fourteatoo.pathfinder.jdbc :as jdbc]
             [tech.v3.dataset.modelling :as model]
             [tablecloth.api :as tc]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [fourteatoo.pathfinder.config :as c]))
 
 
-(def worldcities-path "../data/worldcities.csv")
+(def default-worldcities-path
+  "../data/worldcities.csv")
+
+(defn worldcities-path []
+  (or (c/conf :datasets :cities)
+      default-worldcities-path))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 

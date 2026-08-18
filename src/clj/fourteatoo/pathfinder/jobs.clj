@@ -1,13 +1,21 @@
 (ns fourteatoo.pathfinder.jobs
-  (:require [fourteatoo.pathfinder.jdbc :as jdbc]
-            [fourteatoo.pathfinder.load :as load]
-            [tablecloth.api :as tc]
-            [fourteatoo.pathfinder.util :as util]
-            [fourteatoo.pathfinder.cities :as cities]
-            [fourteatoo.pathfinder.search :as search]
-            [scicloj.kindly.v4.kind :as kind]))
+  (:require
+   [fourteatoo.pathfinder.cities :as cities]
+   [fourteatoo.pathfinder.config :as c]
+   [fourteatoo.pathfinder.jdbc :as jdbc]
+   [fourteatoo.pathfinder.load :as load]
+   [fourteatoo.pathfinder.search :as search]
+   [fourteatoo.pathfinder.util :as util]
+   [scicloj.kindly.v4.kind :as kind]
+   [tablecloth.api :as tc]))
 
-(def job-postings-path "../data/postings.csv")
+
+(def default-jobs-path
+  "../data/postings.csv")
+
+(defn job-postings-path []
+  (or (c/conf :datasets :jobs)
+      default-jobs-path))
 
 (defn drop-jobs-table []
   (println "dropping jobs table")
@@ -36,16 +44,6 @@
     (load/create-table-from-dataset ds "jobs")
     (count (jdbc/insert-dataset ds "jobs"))))
 
-(comment
-  (jdbc/drop-table "jobs")
-  (load-job-postings)
-  (def jobs (load/load-dataset job-postings-path))
-  (tc/select-columns (tc/info jobs) [:col-name :datatype])
-  (let [ds (load/load-dataset job-postings-path)]
-    (load/create-table-from-dataset ds "jobs")
-    (jdbc/insert-dataset ds "jobs"))
-  (jdbc/describe-table "jobs"))
-
 (defn fetch-jobs []
   (tc/dataset (jdbc/execute "select * from jobs")))
 
@@ -58,12 +56,12 @@
 (defn- geo-rows [ds]
   (-> ds
       (tc/drop-missing [:latitude :longitude :location])
-      ;; Group by coordinates and name to count identical entries
       (tc/group-by [:latitude :longitude :location])
       (tc/aggregate {:offer-count tc/row-count})
       (tc/rows :as-maps)))
 
-;; Calculate a dynamic scaling factor based on the max volume to prevent huge markers
+;; Calculate a dynamic scaling factor based on the max volume to
+;; prevent huge markers
 
 (defn- dynamic-map-spec [geo-rows]
   (let [max-offers (apply max (map :offer-count geo-rows))
@@ -71,11 +69,11 @@
     {:data [{:type "scattergeo"
              :lon (map :longitude geo-rows)
              :lat (map :latitude geo-rows)
-             ;; Custom dynamic hover text showing the count
+             ;; dynamic hover text showing the count
              :text (map #(str (:location-name %) " (" (:offer-count %) " jobs)") geo-rows)
              :mode "markers"
              :marker {:size (map (fn [r] 
-                                   ;; Math utility scaling the size gracefully up to 30px max
+                                   ;; scaling the size gracefully up to 30px max
                                    (+ base-size (* 25 (/ (:offer-count r) max-offers)))) 
                                  geo-rows)
                       :opacity 0.75

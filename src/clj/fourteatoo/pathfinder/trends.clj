@@ -6,10 +6,16 @@
             [scicloj.kindly.v4.kind :as kind]
             [clojure.set :as set]
             [fourteatoo.pathfinder.cities :as cities]
-            [camel-snake-kebab.core :as csk]))
+            [camel-snake-kebab.core :as csk]
+            [fourteatoo.pathfinder.config :as c]))
 
 
-(def tech-survey-path "../data/stackoverflow/survey2025.csv.xz")
+(def default-tech-survey-path
+  "../data/stackoverflow/survey2025.csv.xz")
+
+(defn tech-survey-path []
+  (or (c/conf :datasets :survey)
+      default-tech-survey-path))
 
 (defn- unroll-tech-col
   "Selects country + target tech column, splits delimited strings, and unrolls."
@@ -113,7 +119,7 @@
 
 
 (comment
-  (def survey-csv tech-survey-path)
+  (def survey-csv (tech-survey-path))
   (analyze-year-file survey-csv 2025)
   (analyze-year-file "../data/stackoverflow/survey2023.csv.xz" 2023)
   (analyze-year-file "../data/stackoverflow/survey2024.csv.xz" 2024)
@@ -134,7 +140,7 @@
 
 (comment
   (jdbc/drop-table "trends")
-  (load-trends tech-survey-path 2025)
+  (load-trends (tech-survey-path) 2025)
   (jdbc/execute "select * from trends"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -425,7 +431,7 @@
   (delay
     (build-so->coords-lookup
      (all-countries-in-so-ds
-      (load/load-dataset tech-survey-path
+      (load/load-dataset (tech-survey-path)
                          {:column-whitelist ["Country"]
                           :key-fn csk/->kebab-case-keyword}))
      (cities/country-centroids-from-simplemaps

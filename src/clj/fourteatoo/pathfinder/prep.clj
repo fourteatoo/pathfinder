@@ -16,8 +16,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
 
 (defn bootstrap-db []
-  (println "Dropping tables")
   ;; drop the tables if still around
+  (println "Dropping tables")
   (cities/drop-cities-table)
   (jobs/drop-jobs-table)
   (courses/drop-courses-table)
@@ -25,12 +25,11 @@
   ;; reload the tables
   (println "Loading tables")
   (println "loading cities")
-  (cities/load-cities cities/worldcities-path)
+  (cities/load-cities (cities/worldcities-path))
   (println "loading jobs")
-  (jobs/load-job-postings jobs/job-postings-path)
+  (jobs/load-job-postings (jobs/job-postings-path))
   (println "loading courses")
-  ;; (courses/load-courses courses/courses-path)
-  (courses/load-courses2 courses/courses2-path)
+  (courses/load-courses2 (courses/courses-path))
   (println "loading trends")
   (trends/load-trends "../data/stackoverflow/survey2023.csv.xz" 2023)
   (trends/load-trends "../data/stackoverflow/survey2024.csv.xz" 2024)

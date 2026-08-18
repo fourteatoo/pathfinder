@@ -142,7 +142,7 @@
 ;; https://www.kaggle.com/datasets/asaniczka/linkedin-data-engineer-job-postings
 
 (def jobs
-  (load/load-dataset jobs/job-postings-path))
+  (load/load-dataset (jobs/job-postings-path)))
 
 (ds-info jobs)
 
@@ -153,7 +153,7 @@
 ;; The jobs contain synthetic data that doesn't always make much
 ;; sense for our specific presentation:
 
-(-> (load/load-dataset jobs/job-postings-path :column-whitelist ["job_location" "search_city" "search_country"])
+(-> (load/load-dataset (jobs/job-postings-path) :column-whitelist ["job_location" "search_city" "search_country"])
     (tc/rename-columns {:job-location :location})
     (tc/drop-missing [:location])
     (tc/group-by [:location])
@@ -197,7 +197,7 @@
 ;; which famously performs a yearly survey.
 
 (def survey
-  (load/load-dataset trends/tech-survey-path :num-rows 20))
+  (load/load-dataset (trends/tech-survey-path) :num-rows 20))
 
 (ds-info survey)
 
@@ -324,7 +324,7 @@
 ^:kindly/hide-code
 (trends/plot-survey-geo-distribution
  (trends/join-so-data-with-centroids
-  (trends/extract-country-overview trends/tech-survey-path)))
+  (trends/extract-country-overview (trends/tech-survey-path))))
 
 ;; ## Implementation details
 ;;
