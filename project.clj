@@ -41,13 +41,36 @@
   :source-paths ["src/clj" "src/cljs"]
   :target-path "target/%s"
   :repl-options {:init-ns fourteatoo.pathfinder.core}
-  :plugins [[lein-cljsbuild "1.1.8"]]
+  :plugins [[lein-cljsbuild "1.1.8"]
+            [lein-shell "0.5.0"]]
   :hooks [leiningen.cljsbuild]
   :aliases {"slides" ["with-profile" "dev" "run" "-m" "clojure.main" "-e"
                       "(require '[slides :as s]) (s/make-slides)"]
             "notebook" ["with-profile" "dev" "run" "-m" "clojure.main" "-e"
                         "(require '[notebook :as n]) (n/make-notebook)"]
-            "build-docs" ["do" ["slides"] ["notebook"]]}
+            "build-docs" ["do" ["slides"] ["notebook"]]
+            "publish-docs"
+            ["do"
+             ["build-docs"]
+             ["shell" "touch" "docs/.nojekyll"]
+             ["shell" "cp" "docs/notebook.html" "docs/index.html"]
+             ["shell" "cp" ".gitignore" "docs/.gitignore"]
+
+             ;; Initialize temporary single-commit repository inside docs/
+             ["shell" "git" "-C" "docs" "init"]
+             ["shell" "git" "-C" "docs" "checkout" "-b" "gh-pages"]
+             ["shell" "git" "-C" "docs" "add" "."]
+             ["shell" "git" "-C" "docs" "commit" "-m" "Deploy latest static docs"]
+
+             ;; Pass origin directly without shell sub-command evaluation
+             #_["shell" "git" "-C" "docs" "push" "--force" "origin" "gh-pages"]
+             ["shell" "sh" "-c" "git -C docs remote add origin `git config --get remote.origin.url`"]
+             #_["shell" "sh" "-c" "git -C docs remote add origin $(git config --get remote.origin.url)"]
+             ["shell" "git" "-C" "docs" "push" "--force" "origin" "gh-pages"]
+
+             ;; Clean up temporary .git folder
+             ["shell" "rm" "-rf" "docs/.git"]]}
+
   :profiles {:uberjar {:aot :all
                        :prep-tasks ["compile" ["cljsbuild" "once" "min"]]
                        :jvm-opts ["-Xmx2g"
