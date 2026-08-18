@@ -75,8 +75,8 @@ None.
 
 This is a proof of concept, not an application you should try at home.
 
-No data is provided, although the notebook contains tips of as to
-where to find it.
+No data is provided, although the notebook contains tips on where to
+find it.
 
 
 ## License
