@@ -18,7 +18,10 @@ embedding applied to a modern problem.
 
 A notebook (Clay) and a couple of slides are included in the
 `notebooks` directory.  You can also find a pre-formatted, static
-version in the GitHub Pages https://fourteatoo.github.io/pathfinder
+version in the GitHub Pages:
+
+   - [The Notebook](https://fourteatoo.github.io/pathfinder)
+   - [The Slides](https://fourteatoo.github.io/pathfinder/slides-revealjs.html)
 
 
 ## Dependencies
