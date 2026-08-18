@@ -1,8 +1,11 @@
 # pathfinder
 
-![Pathfinder Mascot](resources/public/images/boyscout.png)
-
 A career path discovery engine.
+
+<p align="right">
+  <img src="resources/public/images/boyscout.png" alt="Pathfinder Mascot" width="300">
+</p>
+
 
 Pathfinder is a PoC for an application that lets the user discover
 possible career paths, being that employment or further skill
@@ -10,8 +13,8 @@ development.  It tries to achieve that leveraging semantic
 similarities between profile and job offers, between job offers and
 online courses, market data and logistic constraints.
 
-The app, although monolithic, is conceptually split between a backend
-written in Clojure and a frontend written in ClojureScript.
+The app, although self-contained, is conceptually split between a
+backend written in Clojure and a frontend written in ClojureScript.
 
 A notebook (Clay) and a couple of slides are included in the
 `notebooks` directory.
