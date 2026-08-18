@@ -1,26 +1,32 @@
 # pathfinder
 
-A career path discovery engine.
-
 <img src="resources/public/images/boyscout.png" alt="Pathfinder Mascot" width="250" align="right" style="margin-left: 20px; margin-bottom: 10px;">
 
+A career path discovery engine.
 
-Pathfinder is a PoC for an application that lets the user discover
-possible career paths, being that employment or further skill
-development.  It tries to achieve that leveraging semantic
+Pathfinder is a proof of concept for an application that lets the user
+discover possible career paths, being that employment or further skill
+development.  It tries to achieve such goal leveraging semantic
 similarities between profile and job offers, between job offers and
 online courses, market data and logistic constraints.
 
 The app, although self-contained, is conceptually split between a
 backend written in Clojure and a frontend written in ClojureScript.
 
+The ultimate scope of this project is to showcase the use of text
+embedding applied to a modern problem.
+
 A notebook (Clay) and a couple of slides are included in the
-`notebooks` directory.
+`notebooks` directory.  You can also find a pre-formatted, static
+version in the GitHub Pages https://fourteatoo.github.com/pathfinder
 
 
 ## Dependencies
 
 Pathfinder needs a DuckDB installation, a local LLM or a Groq account.
+
+You also need some data to populate your DB.
+
 
 ## Installation
 
@@ -43,6 +49,10 @@ or the slides
    $ lein slides
 
 
+At this point you should be hunting for your data, to see the app
+working.  See the notebook for some ideas.
+
+
 ## Usage
 
 To start the app is as simple as:
@@ -52,13 +62,18 @@ To start the app is as simple as:
 then connect with your browser to http://localhost:8080 and you should
 be good to go.
 
+
 ## Options
 
-TODO
+None.
+
 
 ### Bugs
 
-Aplenty.  This is a proof of concept and it is not "production" ready.
+This is a proof of concept, not an application you should try at home.
+
+No data is provided, although the notebook contains tips of as to
+where to find it.
 
 
 ## License
