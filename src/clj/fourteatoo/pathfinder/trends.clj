@@ -1,14 +1,14 @@
 (ns fourteatoo.pathfinder.trends
-  (:require [tablecloth.api :as tc]
-            [clojure.string :as s]
-            [fourteatoo.pathfinder.load :as load]
-            [fourteatoo.pathfinder.jdbc :as jdbc]
-            [scicloj.kindly.v4.kind :as kind]
-            [clojure.set :as set]
-            [fourteatoo.pathfinder.cities :as cities]
-            [camel-snake-kebab.core :as csk]
-            [fourteatoo.pathfinder.config :as c]))
-
+  (:require
+   [camel-snake-kebab.core :as csk]
+   [clojure.set :as set]
+   [clojure.string :as s]
+   [fourteatoo.pathfinder.cities :as cities]
+   [fourteatoo.pathfinder.config :as c]
+   [fourteatoo.pathfinder.jdbc :as jdbc]
+   [fourteatoo.pathfinder.load :as load]
+   [scicloj.kindly.v4.kind :as kind]
+   [tablecloth.api :as tc]))
 
 (def default-tech-survey-path
   "../data/stackoverflow/survey2025.csv.xz")
