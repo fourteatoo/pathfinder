@@ -131,14 +131,6 @@
 (defn rename-column [table from to]
   (execute "ALTER TABLE " table " RENAME COLUMN " from " TO " to))
 
-#_(defn insert-dataset
-  ([ds]
-   (let [ds (ds-sql/sanitize ds)]
-     (ds-sql/ensure-table! (db-conn) ds)
-     (ds-sql/insert-dataset! (db-conn) ds)))
-  ([ds table-name]
-   (insert-dataset (tc/set-dataset-name ds table-name))))
-
 (defn insert-dataset
   ([ds]
    (insert-dataset ds (tc/dataset-name ds)))
@@ -165,17 +157,7 @@
   (list-tables)
   (describe-table "cities"))
 
-(defn find-jobs-by-neighbours [embedding & {:keys [limit]
-                                            :or {limit 5}}]
-  ;; embeddings should all be the same length
-  (jdbc/execute! (db-conn) [(str "SELECT *,
-                               array_cosine_distance(emb, [0.10, 0.80, -0.40]::FLOAT["
-                               (count embedding)
-                               "]) AS semantic_distance
-                               FROM jobs_embedded
-                               ORDER BY semantic_distance ASC
-                               LIMIT " limit)]))
-
+#_
 (defn load-table [table rows & {:keys [batch-size]
                                 :or {batch-size 5000}}]
   (let [columns (keys (first rows))
