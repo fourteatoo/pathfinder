@@ -2,9 +2,7 @@
 
 A career path discovery engine.
 
-<p align="right">
-  <img src="resources/public/images/boyscout.png" alt="Pathfinder Mascot" width="300">
-</p>
+<img src="resources/public/images/boyscout.png" alt="Pathfinder Mascot" width="250" align="right" style="margin-left: 20px; margin-bottom: 10px;">
 
 
 Pathfinder is a PoC for an application that lets the user discover
