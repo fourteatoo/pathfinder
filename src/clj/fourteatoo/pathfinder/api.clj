@@ -85,10 +85,14 @@
       (handle-course-search req)
 
       ;; Fallback to index.html for SPA page loads / refreshes
-      :else
+      (or (= uri "/") (= uri "/index.html"))
       {:status 200
        :headers {"Content-Type" "text/html"}
-       :body (slurp (io/resource "public/index.html"))})))
+       :body (slurp (io/resource "public/index.html"))}
+      :else
+      {:status 404
+       :headers {"Content-Type" "text/plain"}
+       :body "404 Not Found"})))
 
 (def app
   (-> api-routes
