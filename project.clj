@@ -12,7 +12,7 @@
                  [org.scicloj/tableplot "1-beta17"]
                  [techascent/tech.ml.dataset.sql "7.029"]
                  ;; [generateme/fastmath "2.3.0"]
-                 [net.clojars.savya/embeddings-clj "0.5.0"]
+                 [net.clojars.savya/embeddings-clj "0.5.1"]
                  ;; alternative interface to DuckDB
                  [com.github.seancorfield/next.jdbc "1.3.1118"]
                  [com.zaxxer/HikariCP "7.1.0"]
