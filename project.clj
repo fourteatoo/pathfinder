@@ -56,22 +56,4 @@
              :dev {:dependencies [[org.scicloj/clay "2.0.21"]
                                   [hiccup "2.0.0"]
                                   [thheller/shadow-cljs "3.4.12" :exclusions [hiccup]]]
-                   :source-paths ["notebooks"]}}
-  :cljsbuild {:builds
-              [{:id "dev"
-                :source-paths ["src/cljs"]
-                :resource-paths ["target/public"]
-                :compiler {:main          pathfinder.core
-                           ;; :npm-deps      false      ;; Prevents shelling out to Node for module-deps
-                           :output-to     "target/public/js/app.js"       ;; Build output
-                           :output-dir    "target/public/js/out"          ;; Transient JS files
-                           :asset-path    "/js/out"}}                     ;; URL path browser requests
-               
-               {:id "min"
-                :source-paths ["src/cljs"]
-                :resource-paths ["target/public"]
-                :compiler {:main          pathfinder.core
-                           ;; :npm-deps      false      ;; Prevents shelling out to Node for module-deps
-                           :output-to     "target/public/js/app.js"
-                           :optimizations :advanced
-                           :pretty-print  false}}]})
+                   :source-paths ["notebooks"]}})
