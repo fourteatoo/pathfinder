@@ -144,5 +144,7 @@
      (if (seq jobs)
        (for [j jobs]
          ^{:key (or (:job-id j) (:job-title j))} [job-card j])
-       [:div {:class "alert alert-info"}
-        [:span "No job search results yet. Return to the Profile tab to search."]])]))
+       [:div
+        [:div {:class "alert alert-info"}
+         [:span "No job search results yet. Return to the Profile tab to search."]]
+        [:img {:src "images/desktop.jpg"}]])]))
