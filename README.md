@@ -1,5 +1,7 @@
 # pathfinder
 
+![Pathfinder Mascot](resources/public/images/boyscout.png =250x)
+
 A career path discovery engine.
 
 Pathfinder is a PoC for an application that lets the user discover
