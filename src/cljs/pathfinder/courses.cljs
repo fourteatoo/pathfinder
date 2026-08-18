@@ -226,8 +226,10 @@
 
      ;; Main Content Area
      (if (nil? selected-job)
-       [:div {:class "card bg-base-100 p-12 text-center text-base-content/50"}
-        "Please select or match a job position in Tab 2 to view skill gap recommendations."]
+       [:div
+        [:div {:class "alert alert-info"}
+         "Please select or match a job position in Tab 2 to view skill gap recommendations."]
+        [:img {:src "images/desktop.jpg" :width 500}]]
 
        [:div {:class "space-y-6"}
         ;; Target Context Card
