@@ -1,6 +1,6 @@
 # pathfinder
 
-![Pathfinder Mascot](resources/public/images/boyscout.png =250x)
+![Pathfinder Mascot](resources/public/images/boyscout.png)
 
 A career path discovery engine.
 
