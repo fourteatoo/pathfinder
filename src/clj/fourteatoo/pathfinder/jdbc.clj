@@ -30,8 +30,8 @@
   "Inspects the first element of a vector to determine the SQL type name."
   [v]
   (let [sample (first v)]
-    (cond (nil? sample) "VARCHAR" ; safe default for empty vectors
-          (float? sample) "FLOAT"   ; or "DOUBLE" depending on your target DB precision
+    (cond (nil? sample) "VARCHAR"
+          (float? sample) "FLOAT"
           (integer? sample) "INTEGER"
           (boolean? sample) "BOOLEAN"
           (string? sample) "VARCHAR"
@@ -48,9 +48,7 @@
   float/1
   (set-parameter [v ^java.sql.PreparedStatement stmt ^long idx]
     (let [conn (.getConnection stmt)
-          ;; Box floats to Objects for java.sql.Array creation
           boxed-arr (object-array (map object-array [v]))
-          ;; createArrayOf expects Object[]
           sql-arr (.createArrayOf conn "FLOAT" (to-array (map float v)))]
       (.setArray stmt idx sql-arr)))
 
@@ -58,7 +56,7 @@
   (set-parameter [^tech.v3.dataset.Text v ^java.sql.PreparedStatement stmt ^long ix]
     (.setString stmt ix (.toString v))))
 
-;; Automatically convert DuckDB native arrays back into clean Clojure
+;; Automatically convert DuckDB native arrays back into Clojure
 ;; vectors
 (extend-protocol rs/ReadableColumn
   org.duckdb.DuckDBArray
