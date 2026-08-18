@@ -10,7 +10,7 @@
       [:div {:class "tabs tabs-boxed"}
        [:a {:class (str "tab " (when (= curr-tab :profile) "tab-active"))
             :on-click #(swap! state assoc :active-tab :profile)} 
-        "1. Candidate Profile"]
+        "1. Profile"]
        [:a {:class (str "tab " (when (= curr-tab :jobs) "tab-active"))
             :on-click #(swap! state assoc :active-tab :jobs)} 
         "2. Job Matching"]
