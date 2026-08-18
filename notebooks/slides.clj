@@ -3,7 +3,9 @@
   {:clay {:quarto-target-path "docs"
           :quarto {:format {:revealjs {:theme "default"
                                        :slide-number true}
-                            :pptx {}}}}} ; Add pptx configs here
+                            ;; Add pptx configs here
+                            :pptx {}}}
+          :title "Pathfinder"}}
   (:require
    [fourteatoo.pathfinder.jdbc :as jdbc]
    [fourteatoo.pathfinder.trends :as trends]
@@ -13,10 +15,15 @@
    [scicloj.kindly.v4.kind :as kind]
    [tablecloth.api :as tc]))
 
+
+^:kindly/hide-code
+(comment
 ;; Thoughout the slides we use stuff that needs the DB.  And we do so
 ;; at load time!  So all the namespaces need to be intitialised now.
+  )
+
 ^:kindly/hide-code
-(mount/start)
+ (def started (mount/start))
 
 ^:kindly/hide-code
 (defn make-slides []
@@ -26,9 +33,8 @@
   ;; module.  Just manually use clay/make when necessary.
   (clay/make! {:source-path "notebooks/slides.clj"
                :add-to-buffer false
-               ;; :in-memory false
-               ;; :serve? false
                :browse false
+               :format [:quarto :revealjs]
                :show false})
   (mount/stop)
   (System/exit 0))
@@ -100,7 +106,6 @@
 
 
 
-;;; # Career Pathfinder Engine PoC
 
 ;; # The Problem
 ;;
@@ -129,9 +134,9 @@
 ;; ---
 
 ;;
-;; Then comes the lengthy reading, the decoding, the CV tweaking, the
-;; application, etc.  And that's when one is the perfect fit for the
-;; job.  But how about when she isn't?
+;; Then comes the lengthy reading, even the decoding, the profile
+;; tweaking, the application, etc.  And that's when one is the perfect
+;; fit for the job.  But what about when she isn't?
 ;;
 ;; Enter Pathfinder.
 
@@ -162,9 +167,23 @@
 ;;  - GenAI for CV tailoring
 ;;  - Market metadata (where available)
 
+;; ---
+
+^:kindly/hide-code
+(kind/image "resources/public/images/desktop.jpg")
+
+
+
 ;; # The Market
 ;;
 ;; Why do we serve market data?
+;;
+;; Course recommendations based on semantic similarity alone don't
+;; give the entire picture.  We want to know how a course can
+;; potentially transform our life, in the context of what the market
+;; offers and the community's opinion.
+
+;; ## Segmentation
 ;; 
 ;; The StackOverflow's survey covers a whole lot of technologies
 ;; across several countries.  We take care of taking a picture of a
@@ -177,7 +196,8 @@
 (trends/plot-trends
  (tc/select-rows @trends/trends-ds
                  (fn [row]
-                   (and (> (:have-count row) 400)
+                   (and (= (:year row) 2025)
+                        (> (:have-count row) 400)
                         (= "Germany" (:country row))))))
 
 ;; ## For USA:
@@ -186,7 +206,8 @@
 (trends/plot-trends
  (tc/select-rows @trends/trends-ds
                  (fn [row]
-                   (and (> (:have-count row) 900)
+                   (and (= (:year row) 2025)
+                        (> (:have-count row) 900)
                         (= "United States of America" (:country row))))))
 
 ;; ---
@@ -199,7 +220,8 @@
 ;; 
 ;; ## The Pay Gap
 ;; 
-;; Her is how the surveys distribute incomes across the globe:
+;; How the StackOverflow's survey distribute income across the
+;; the regions
 ^:kindly/hide-code
 (trends/plot-survey-geo-distribution
  (trends/join-so-data-with-centroids
@@ -207,9 +229,12 @@
 
 ;; # Architecture diagrams
 ;;
-;; Odd looking boxes connected by arrows
+;; Because it's not just code that can look like spaghetti
 
-;; ## Data sources and their role within the app
+;; ## Data flow
+;;
+;; Although the data comes from disparate sources, it is all ingested
+;; in DuckDB tables for easy access.
 
 ^:kindly/hide-code
 (def pipeline-diagram
@@ -229,19 +254,19 @@
         T_Cities[(Cities Table)]
       end
 
-      subgraph StoredEmbeddings[Pre-computed Vector Embeddings]
+      subgraph StoredEmbeddings[Vector Embeddings]
         E_Jobs[Job Embeddings]
         E_Courses[Course Embeddings]
       end
 
       subgraph External[Runtime Inputs]
-        Files[/External CV Files/]
-        UI_Coords[/UI Coordinates/]
+        Files[/CV Files/]
+        UI_Coords[/Geo Coord/]
       end
 
       subgraph Dynamic[On-the-Fly Processing]
-        E_CVs[CV Embedding Engine]
-        Map_Country[Coord-to-Country Lookup]
+        E_CVs[Embedding Engine]
+        Map_Country[Country Coord Lookup]
       end
 
       K --> T_Jobs
@@ -275,11 +300,14 @@
       class HF optional;
    "))
 
+;; <div style="width: 100%; max-width: 100%; font-size: 0.9em;">
+^:kindly/hide-code
 pipeline-diagram
+;; </div>
 
 ;; ## User interface
 ;;
-;; How the app should look and behave, but never does.
+;; How the app should behave, but never does
 
 
 ^:kindly/hide-code
@@ -324,6 +352,17 @@ pipeline-diagram
       linkStyle default stroke-width:2px;
    "))
 
+^:kindly/hide-code
 ui-diagram
 
-;; EOF
+;; # Additional Material
+
+;; GitHub repo at
+;; https://github.com/fourteatoo/pathfinder
+;;
+;; GitHub Pages at
+;; https://fourteatoo.github.io/pathfinder
+
+;; <div style="text-align: center;">
+;;   <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://github.com/fourteatoo/pathfinder" alt="Scan to view repo" style="width: 250px; height: 250px;">
+;; </div>
