@@ -344,7 +344,7 @@
 ;; 
 ;; # Architecture diagrams
 ;;
-;; Odd looking boxes connected by arrows
+;; Odd looking boxes connected by squiggly lines
 
 ;; ## Data sources and their role within the app
 
@@ -416,7 +416,7 @@ pipeline-diagram
 
 ;; ## User interface
 ;;
-;; How the app should look and behave, but never does.
+;; How the app should behave, when it behaves.
 
 
 ^:kindly/hide-code
