@@ -294,7 +294,6 @@
 
 ;; ## For Germany:
 
-^:kindly/hide-code
 (trends/plot-trends
  (tc/select-rows @trends/trends-ds
                  (fn [row]
@@ -304,7 +303,6 @@
 
 ;; ## For USA:
 
-^:kindly/hide-code
 (trends/plot-trends
  (tc/select-rows @trends/trends-ds
                  (fn [row]
@@ -321,7 +319,7 @@
 ;; ## The Pay Gap
 ;; 
 ;; Her is how the surveys distribute incomes across the globe:
-^:kindly/hide-code
+
 (trends/plot-survey-geo-distribution
  (trends/join-so-data-with-centroids
   (trends/extract-country-overview (trends/tech-survey-path))))
