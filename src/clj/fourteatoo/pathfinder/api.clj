@@ -47,10 +47,6 @@
                                :latitude latitude :longitude longitude
                                :geo-radius geo-radius)}))
 
-#_(->> 
-   ;; JS cannot handle BigInts
-   (map #(update % :job-id str)))
-
 (comment
   (search/search-cities "Frankfurt")
   (search/search-jobs "python developer" :latitude 50.1106 :longitude 8.6822 :geo-radius 500))
@@ -68,26 +64,23 @@
         method (:request-method req)
         body (:body req)]
     (cond
-      ;; Search jobs against CV vector
       (and (= method :post) (= uri "/api/search-jobs"))
       (handle-job-search req)
 
-      ;; Tailor CV for a specific job offer
       (and (= method :post) (= uri "/api/tailor-cv"))
       (handle-cv-tailor req)
 
       (and (= method :post) (= uri "/api/search-cities"))
       (handle-city-search req)
 
-      ;; Recommend courses that bridge the CV -> Job gap
       (and (= method :post) (= uri "/api/recommend-courses"))
       (handle-course-search req)
 
-      ;; Fallback to index.html for SPA page loads / refreshes
       (or (= uri "/") (= uri "/index.html"))
       {:status 200
        :headers {"Content-Type" "text/html"}
        :body (slurp (io/resource "public/index.html"))}
+
       :else
       {:status 404
        :headers {"Content-Type" "text/plain"}
@@ -111,8 +104,3 @@
   :start (start!)
   :stop (stop! server))
 
-
-
-(comment
-  (mount/start)
-  (mount/stop))
