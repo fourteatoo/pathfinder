@@ -44,7 +44,7 @@
      (when (seq suggestions)
        [:ul {:class "menu bg-base-200 w-full rounded-box absolute top-20 z-10 shadow-lg max-h-60 overflow-y-auto"}
         (for [c suggestions]
-          ^{:key (:name c)}
+          ^{:key (:city c)}
           [:li [:a {:on-click #(select-city! c)} 
                 (str (:city c) " (" (:country c) ")")]])])]))
 
