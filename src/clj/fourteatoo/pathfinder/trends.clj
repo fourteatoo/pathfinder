@@ -338,18 +338,20 @@
      :market-avg-desirability avg-desirability
      :skill-metrics matched-metrics}))
 
+(defn- course-skills [course]
+  (->> (if (string? (:gained-skills course))
+         (clojure.string/split (:gained-skills course) #",")
+         (:gained-skills course))
+       (map clojure.string/trim)))
 
 (defn course-market-metrics-with-trends
   [course country]
-  (let [skills (if (string? (:gained-skills course))
-                 (clojure.string/split (:gained-skills course) #",")
-                 (:gained-skills course))
-        trimmed-skills (map clojure.string/trim skills)
-        skill-histories (for [s trimmed-skills
+  (let [skills (course-skills course)
+        skill-histories (for [s skills
                               :let [history (find-so-metric-for-skill s country)]
                               :when (seq history)]
                           {:course-skill s
-                           :history      history})
+                           :history history})
         matched-metrics (keep (fn [{:keys [course-skill history]}]
                                 (when-let [processed (attach-skill-trends history {:salary 1000.0 :adoption 0.005 :desirability 0.02})]
                                   (assoc processed :skill course-skill)))
