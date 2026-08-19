@@ -166,7 +166,7 @@
 ;; ### The courses are from Kaggle
 
 (def courses
-  (load/load-dataset courses/courses-path))
+  (load/load-dataset (courses/courses-path)))
 
 (ds-info courses)
 
