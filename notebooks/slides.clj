@@ -109,8 +109,8 @@
 
 ;; # The Problem
 ;;
-;; What does one do when she's looking for a job?  A quick visit to
-;; Indeed, LinkedIn, or other professional platform usually is the
+;; What do you do when you are looking for a new job?  A quick visit
+;; to Indeed, LinkedIn, or other professional platform usually is the
 ;; start.
 
 ;; ---
@@ -134,9 +134,9 @@
 ;; ---
 
 ;;
-;; Then comes the lengthy reading, even the decoding, the profile
-;; tweaking, the application, etc.  And that's when one is the perfect
-;; fit for the job.  But what about when she isn't?
+;; Then comes the offer decoding, the profile tweaking, the
+;; application, etc.  And that's when you are the perfect fit for the
+;; job.  But what about when you aren't?
 ;;
 ;; Enter Pathfinder.
 

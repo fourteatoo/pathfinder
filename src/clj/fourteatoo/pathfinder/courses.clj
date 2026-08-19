@@ -48,8 +48,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-;; With additional data, missing from the base CSV, above
-
 (defn- parse-python-list-regex
   [s]
   (if (s/blank? s)
