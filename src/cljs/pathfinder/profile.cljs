@@ -77,11 +77,7 @@
                   (parse-and-set-edn! text))))
         (.readAsText reader file)))))
 
-;; Helper to build the exact payload sent to /api/search-jobs or /api/tailor-cv
-(defn get-cv-payload []
-  (:profile @state))
-
-;; A Form-2 component: the outer function runs ONCE to set up local state
+;; the outer function runs ONCE to set up local state
 (defn skills-input [skills]
   (let [last-skills (r/atom skills)
         local-str   (r/atom (s/join ", " skills))]
