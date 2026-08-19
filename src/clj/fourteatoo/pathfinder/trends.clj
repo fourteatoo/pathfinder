@@ -193,6 +193,7 @@
        (remove s/blank?)
        (into #{})))
 
+#_
 (defn skills-match?
   "Returns true if the set of tokens in technology A is a subset of B, or B of A."
   [skill-a skill-b]
@@ -206,15 +207,63 @@
 (comment
   (jdbc/execute "select * from trends limit 3"))
 
+(defn- match-score
+  "Calculates token similarity between 0.0 and 1.0 using Jaccard Similarity."
+  [skill-a skill-b]
+  (let [set-a (tokenize-tech skill-a)
+        set-b (tokenize-tech skill-b)]
+    (if (and (seq set-a) (seq set-b))
+      (let [intersection-count (count (set/intersection set-a set-b))
+            union-count (count (set/union set-a set-b))]
+        (/ (double intersection-count) union-count))
+      0.0)))
+
+;; return a list of metrics; its history
+#_
 (defn find-so-metric-for-skill [skill country]
   (->> (jdbc/execute "select * from trends where country = ?" country)
        (filter (fn [metric]
                  (skills-match? skill (:technology metric))))))
 
+(defn find-so-metric-for-skill [skill country]
+  (let [rows (jdbc/execute "select * from trends where country = ?" country)
+        tech-names (into #{} (map :technology) rows)
+        ;; 1. Score every unique technology in the dataset
+        scored-techs (->> tech-names
+                          (map (fn [tech] 
+                                 (let [tech-rows (filter #(= (:technology %) tech) rows)
+                                       ;; Use total response count across all years as a popularity tie-breaker
+                                       total-volume (reduce + (map :have-count tech-rows))]
+                                   {:tech tech 
+                                    :score (match-score skill tech)
+                                    :volume total-volume})))
+                          (filter #(> (:score %) 0.3)))
+        ;; 2. Sort by:
+        ;;    a) Match score (highest first)
+        ;;    b) Total volume / popularity (highest first, as tie-breaker)
+        ;;    c) Name string (alphabetical, for absolute determinism)
+        best-tech (->> scored-techs
+                       (sort-by (juxt :score :volume :tech) 
+                                (fn [[s1 v1 t1] [s2 v2 t2]]
+                                  (let [c1 (compare s2 s1)      ;; score desc
+                                        c2 (compare v2 v1)]     ;; volume desc
+                                    (if-not (zero? c1)
+                                      c1
+                                      (if-not (zero? c2)
+                                        c2
+                                        (compare t1 t2))))))    ;; tech name asc
+                       first
+                       :tech)]
+    ;; 3. Return ONLY records for the single winning candidate
+    (if best-tech
+      (filter #(= (:technology %) best-tech) rows)
+      [])))
+
 (comment
   (find-so-metric-for-skill "Python Programming" "Germany")
   (find-so-metric-for-skill "Hadoop" "Germany")
   (find-so-metric-for-skill "Spark" "Germany")
+  (find-so-metric-for-skill "SQL" "Germany")
   (map :technology (jdbc/execute "select * from trends where country = ?" "Germany")))
 
 (defn- calculate-trend
