@@ -346,7 +346,10 @@
 ;;
 ;; Odd looking boxes connected by squiggly lines
 
-;; ## Data sources and their role within the app
+;; ## Data flow
+
+;; Although the data comes from disparate sources, it is all ingested
+;; in DuckDB tables for easy access.
 
 ^:kindly/hide-code
 (def pipeline-diagram
@@ -414,7 +417,7 @@
 
 pipeline-diagram
 
-;; ## User interface
+;; ## User Interface
 ;;
 ;; How the app should behave, when it behaves.
 
