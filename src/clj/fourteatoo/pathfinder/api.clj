@@ -18,8 +18,7 @@
   (let [query (get-in req [:body :query] "")
         results (search/search-cities query)]
     {:status 200
-     :headers {"Content-Type" "application/edn"}
-     :body (pr-str results)}))
+     :body results}))
 
 (comment
   (search/search-cities "Milan"))
