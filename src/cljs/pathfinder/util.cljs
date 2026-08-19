@@ -87,3 +87,11 @@
 (defn encode-transit [data]
   (let [w (t/writer :json)]
     (t/write w data)))
+
+(defn api-post [url body]
+  (js/fetch url
+            (clj->js
+             {:method "POST"
+              :headers {"Content-Type" "application/transit+json"
+                        "Accept"       "application/transit+json"}
+              :body (encode-transit body)})))

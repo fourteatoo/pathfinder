@@ -2,22 +2,18 @@
   (:require [reagent.core :as r]
             [clojure.string :as s]
             [pathfinder.state :refer [state]]
-            [pathfinder.util :as util :refer [encode-transit decode-transit]]
+            [pathfinder.util :as util :refer [encode-transit decode-transit api-post]]
             [clojure.set :as set]))
 
 ;; --- API CALL HELPER ---
 (defn fetch-course-recommendations! [job-id]
   (swap! state assoc :courses-loading? true)
-  (-> (js/fetch "/api/recommend-courses"
-                (clj->js {:method "POST"
-                          ;; :headers {"Content-Type" "application/json"}
-                          :headers {"Content-Type" "application/transit+json"
-                                    "Accept"       "application/transit+json"}
-                          :body (encode-transit {:profile (:profile @state)
-                                                 :job job-id
-                                                 ;; these are for the trend stats
-                                                 :latitude (:latitude @state)
-                                                 :longitude (:longitude @state)})}))
+  (-> (api-post "/api/recommend-courses"
+                {:profile (:profile @state)
+                 :job job-id
+                 ;; these are for the trend stats
+                 :latitude (:latitude @state)
+                 :longitude (:longitude @state)})
       #_(.then #(.json %))
       (.then #(.text %))
       (.then (fn [data]

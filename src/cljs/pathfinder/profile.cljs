@@ -3,7 +3,7 @@
             [clojure.string :as s]
             [reagent.core :as r]
             [pathfinder.state :refer [state]]
-            [pathfinder.util :refer [encode-transit decode-transit]]))
+            [pathfinder.util :refer [encode-transit decode-transit api-post]]))
 
 
 (defn select-city! [city-obj]
@@ -16,11 +16,7 @@
 (defn fetch-city-suggestions! [query]
   (if (< (count query) 2)
     (swap! state assoc :city-suggestions [])
-    (-> (js/fetch "/api/search-cities"
-                  (clj->js
-                   {:method "POST"
-                    ;; :headers {"Content-Type" "application/json"}
-                    :body (encode-transit {:query query})}))
+    (-> (api-post "/api/search-cities" {:query query})
         (.then (fn [res]
                  (if (.-ok res)
                    (.text res) #_(.json res)
@@ -219,18 +215,12 @@
 
 (defn search-jobs! []
   (swap! state assoc :loading? true)
-  (-> (js/fetch "/api/search-jobs"
-                (clj->js
-                 {:method "POST"
-                  ;; :headers {"Content-Type" "application/json"}
-                  :headers {"Content-Type" "application/transit+json"
-                            "Accept"       "application/transit+json"}
-                  :body (encode-transit
-                         {:profile (:profile @state)
-                          :location (:location @state)
-                          :latitude (js/parseFloat (:latitude @state))
-                          :longitude (js/parseFloat (:longitude @state))
-                          :geo-radius (js/parseInt (:geo-radius @state))})}))
+  (-> (api-post "/api/search-jobs"
+                {:profile (:profile @state)
+                 :location (:location @state)
+                 :latitude (js/parseFloat (:latitude @state))
+                 :longitude (js/parseFloat (:longitude @state))
+                 :geo-radius (js/parseInt (:geo-radius @state))})
       (.then (fn [res]
                (if (.-ok res)
                  (.text res) #_(.json res)

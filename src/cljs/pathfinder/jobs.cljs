@@ -1,20 +1,14 @@
 (ns pathfinder.jobs
   (:require [pathfinder.state :refer [state]]
-            [pathfinder.util :as util :refer [encode-transit decode-transit]]))
+            [pathfinder.util :as util :refer [encode-transit decode-transit api-post]]))
 
 
 (defn tailor-cv! [job]
   (let [job-id (:job-id job)]
     (swap! state assoc :tailoring-job-id job-id)
-    (-> (js/fetch "/api/tailor-cv"
-                  (clj->js
-                   {:method "POST"
-                    ;; :headers {"Content-Type" "application/json"}
-                    :headers {"Content-Type" "application/transit+json"
-                              "Accept"       "application/transit+json"}
-                    :body (encode-transit
-                           {:cv (:profile @state)
-                            :job job-id})}))
+    (-> (api-post "/api/tailor-cv"
+                  {:cv (:profile @state)
+                   :job job-id})
         (.then (fn [res]
                  (if (.-ok res)
                    (.text res) #_(.json res)
@@ -31,17 +25,12 @@
 
 (defn fetch-course-recommendations! [job]
   (swap! state assoc :courses-loading? true :selected-job job)
-  (-> (js/fetch "/api/recommend-courses"
-                (clj->js
-                 {:method "POST"
-                  ;; :headers {"Content-Type" "application/json"}
-                  :headers {"Content-Type" "application/transit+json"
-                            "Accept"       "application/transit+json"}
-                  :body (encode-transit {:job (:job-id job)
-                                         :profile (:profile @state)
-                                         ;; these are for the trend stats
-                                         :latitude (:latitude @state)
-                                         :longitude (:longitude @state)})}))
+  (-> (api-post "/api/recommend-courses"
+                {:job (:job-id job)
+                 :profile (:profile @state)
+                 ;; these are for the trend stats
+                 :latitude (:latitude @state)
+                 :longitude (:longitude @state)})
       (.then (fn [res]
                (if (.-ok res)
                  (.text res) #_(.json res)
