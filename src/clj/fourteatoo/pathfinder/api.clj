@@ -32,7 +32,7 @@
         job-id  (:job body)]
     {:status 200
      :body (map #(trends/enrich-course-with-market-data % country)
-                (search/filter-recommendations-by-distance
+                (search/filter-recommendations-by-cv-distance
                  (search/recommend-courses-for-job
                   (search/fetch-job job-id) profile)))}))
 

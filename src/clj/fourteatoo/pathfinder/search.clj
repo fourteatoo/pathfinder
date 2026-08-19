@@ -55,7 +55,7 @@
       false
       :else true)))
 
-(defn filter-recommendations-by-distance [recommended-courses]
+(defn filter-recommendations-by-cv-distance [recommended-courses]
   (remove (fn [course]
             (let [cv-dist (or (:cv-dist course) 0.5)
                   level (:level course)]
