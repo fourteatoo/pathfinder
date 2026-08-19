@@ -295,8 +295,12 @@
 
                  ;; Right Column: Relevance & Gap Gauges
                  [:div {:class "w-full md:w-64 bg-base-200 p-4 rounded-box space-y-2.5 shrink-0"}
-                  [stat-gauge {:label "Job Relevance" :pct job-relevance :color-class "progress-success"}]
-                  [stat-gauge {:label "Skill Gap" :pct cv-gap}]
+                  [:div {:class "tooltip tooltip-left w-full" 
+                          :data-tip "How relevant the course is to the job; the higher, the better."}
+                    [stat-gauge {:label "Job Relevance" :pct job-relevance :color-class "progress-success"}]]
+                  [:div {:class "tooltip tooltip-left w-full" 
+                         :data-tip "How significant the course is to your profile; the higher, the more new skills you will learn."}
+                   [stat-gauge {:label "Skill Gap" :pct cv-gap}]]
                   [stat-gauge {:label "Market Adoption":pct market-adoption :trend (:adoption-trend course)}]
                   [stat-gauge {:label "Appeal" :pct appeal :trend (:desirability-trend course)}]
                   [stat-gauge {:label "Salary Exp" :value-str avg-salary :trend (:salary-trend course)}]]]]))])])]))
