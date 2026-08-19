@@ -311,6 +311,7 @@
         (when (pos? total-headcount)
           (double (/ total-weighted-sal total-headcount)))))))
 
+#_
 (defn- course-market-metrics [course country]
   (let [skills (if (string? (:gained-skills course))
                  (clojure.string/split (:gained-skills course) #",")
