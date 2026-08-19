@@ -14,7 +14,7 @@ The app, although self-contained, is conceptually split between a
 backend written in Clojure and a frontend written in ClojureScript.
 
 The ultimate scope of this project is to showcase the use of text
-embedding applied to a modern problem.
+embeddings and GenAI applied to a modern problem.
 
 A notebook (Clay) and a couple of slides are included in the
 `notebooks` directory.  You can also find a pre-formatted, static
