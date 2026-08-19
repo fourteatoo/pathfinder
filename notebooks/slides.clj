@@ -186,8 +186,8 @@
 ;; ## Segmentation
 ;; 
 ;; The StackOverflow's survey covers a whole lot of technologies
-;; across several countries.  We take care of taking a picture of a
-;; localised reality as to avoid bunching together wildly different
+;; across several countries.  We take care of extracting a picture of
+;; a localised reality as to avoid bunching together wildly different
 ;; data groups.
 
 ;; ## For Germany:
@@ -227,135 +227,7 @@
  (trends/join-so-data-with-centroids
   (trends/extract-country-overview (trends/tech-survey-path))))
 
-;; # Architecture diagrams
-;;
-;; Because it's not just code that can look like spaghetti
-
-;; ## Data flow
-;;
-;; Although the data comes from disparate sources, it is all ingested
-;; in DuckDB tables for easy access.
-
-^:kindly/hide-code
-(def pipeline-diagram
-  (kind/mermaid
-   "graph LR
-      subgraph Sources[External Data Sources]
-        K[Kaggle]
-        HF[Hugging Face]
-        SO[StackOverflow]
-        SM[SimpleMaps]
-      end
-
-      subgraph DuckDB[DuckDB Storage]
-        T_Jobs[(Jobs Table)]
-        T_Courses[(Courses Table)]
-        T_Stats[(SO Stats Table)]
-        T_Cities[(Cities Table)]
-      end
-
-      subgraph StoredEmbeddings[Vector Embeddings]
-        E_Jobs[Job Embeddings]
-        E_Courses[Course Embeddings]
-      end
-
-      subgraph External[Runtime Inputs]
-        Files[/CV Files/]
-        UI_Coords[/Geo Coord/]
-      end
-
-      subgraph Dynamic[On-the-Fly Processing]
-        E_CVs[Embedding Engine]
-        Map_Country[Country Coord Lookup]
-      end
-
-      K --> T_Jobs
-      K --> T_Courses
-      HF -.-> T_Jobs
-      SO --> T_Stats
-      SM --> T_Cities
-
-      T_Cities -. Enrichment .-> T_Jobs
-
-      T_Jobs --> E_Jobs
-      T_Courses --> E_Courses
-
-      Files --> E_CVs
-      UI_Coords --> Map_Country
-      T_Cities --> Map_Country
-      Map_Country -. Country Query .-> T_Stats
-
-      classDef db fill:#fff3e0,stroke:#f57c00;
-      classDef embed fill:#e8eaf6,stroke:#3f51b5;
-      classDef ext fill:#fffde7,stroke:#fbc02d;
-      classDef dyn fill:#ede7f6,stroke:#7e57c2;
-      classDef optional fill:#f5f5f5,stroke:#9e9e9e,stroke-dasharray:4;
-      classDef default stroke-width:3px,stroke:#333;
-      linkStyle default stroke-width:2px;
-
-      class DuckDB db;
-      class StoredEmbeddings embed;
-      class External ext;
-      class Dynamic dyn;
-      class HF optional;
-   "))
-
-;; <div style="width: 100%; max-width: 100%; font-size: 0.9em;">
-^:kindly/hide-code
-pipeline-diagram
-;; </div>
-
-;; ## User interface
-;;
-;; How the app should behave, but never does
-
-
-^:kindly/hide-code
-(def ui-diagram
-  (kind/mermaid
-   "graph TD
-      subgraph App[Application UI]
-
-        subgraph Pane1[Pane 1: CV Input]
-          CV_In[Enter / Upload CV]
-        end
-
-        subgraph Pane2[Pane 2: Job Querying]
-          Job_Q[Query Job Offers]
-          Job_List[Display Matching Jobs]
-        end
-
-        subgraph Pane3[Pane 3: Course Matching]
-          Course_List[Relevant Courses & Tech Stats]
-        end
-
-      end
-
-      subgraph Engine[Backend & Embeddings]
-        Match_Jobs[CV <--> Job Vector Match]
-        Match_Courses[Job + CV <--> Course Vector Match]
-      end
-
-      CV_In --> Match_Jobs
-      Job_Q --> Match_Jobs
-      Match_Jobs --> Job_List
-
-      Job_List --> Match_Courses
-      CV_In --> Match_Courses
-      Match_Courses --> Course_List
-
-      style App fill:#f5f5f5,stroke:#616161,stroke-width:1px
-      style Pane1 fill:#e1f5fe,stroke:#0288d1
-      style Pane2 fill:#e8f5e9,stroke:#388e3c
-      style Pane3 fill:#f3e5f5,stroke:#ab47bc
-      classDef default stroke-width:3px,stroke:#333
-      linkStyle default stroke-width:2px;
-   "))
-
-^:kindly/hide-code
-ui-diagram
-
-;; # Additional Material
+;; # Resources
 
 ;; GitHub repo at
 ;; https://github.com/fourteatoo/pathfinder
