@@ -328,17 +328,18 @@
 
 ;; ## Implementation details
 ;;
-;; SO data cover a large number of countries and it looks different
-;; from area to area.  For this reason the indexes calculated by the
-;; app are limited to the area where the user looks for jobs.  for
-;; each skill that is recognised in the course a number of indexes are
-;; calculated.  Eventually those indexes are compounded (averaged) for
-;; the course.
+;; StackOverflow's data covers a large number of countries and it
+;; looks different from region to region.  For this reason the indices
+;; calculated by the app are limited to the area where the user looks
+;; for job opportunities.  For each skill that is recognised in the
+;; course a number of indices are calculated.  Eventually those
+;; indices are compounded (averaged) for the course.
 ;;
 ;; The calculated indexed are:
 ;;   - desirability (appeal)
-;;   - usage in actual job setting (adoption) 
-;;   - expected salary, or rather the median salary of people using the same skill professionally.
+;;   - use in actual job setting (adoption)
+;;   - expected salary or, rather, the median salary of people using
+;;     the same skill professionally
 ;;
 ;; 
 ;; # Architecture diagrams
