@@ -389,8 +389,10 @@
 
 (comment
   (def c (jdbc/execute-one  "select * from courses where title = ? limit 1"
-                            "NoSQL, Big Data, and Spark Foundations Specialization"))
-  (jdbc/execute "select * from trends where technology = ? and country = ?" "Python" "Germany")
+                            "Distributed Computing with Spark SQL"
+                            #_"NoSQL, Big Data, and Spark Foundations Specialization"))
+  (jdbc/execute "select * from trends where technology = ? and country = ?" "SQL" "Germany")
+  (find-so-metric-for-skill "SQL" "Germany")
   (course-market-metrics-with-trends c "Germany"))
 
 (defn enrich-course-with-market-data [course country]
