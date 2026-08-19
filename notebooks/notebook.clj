@@ -182,7 +182,7 @@
 ;; https://simplemaps.com/data/world-cities
 
 (def cities
-  (load/load-dataset cities/worldcities-path))
+  (load/load-dataset (cities/worldcities-path)))
 
 (ds-info cities)
 
