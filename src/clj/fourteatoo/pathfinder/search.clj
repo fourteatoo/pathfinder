@@ -43,15 +43,18 @@
                        (when (seq exp-str) (str "\nWork Experience:\n" exp-str))]))))
 
 (defn- course-level-matches-familiarity? [cv-dist course-level]
-  (let [level (case course-level
-                (nil "Mixed") "Intermediate"
-                course-level)]
+  (let [level (when course-level
+                (s/replace (s/trim (s/lower-case course-level))
+                           #" +level$" ""))
+        level (case level
+                (nil "mixed") "intermediate"
+                level)]
     (cond
-      ;; Candidate knows this domain well -> Drop "Beginner" intro courses
-      (and (< cv-dist 0.35) (= level "Beginner"))
+      ;; Candidate knows this domain well; we drop "Beginner" intro courses
+      (and (< cv-dist 0.35) (= level "beginner"))
       false
-      ;; Candidate is totally new to this domain -> Drop "Advanced" courses
-      (and (> cv-dist 0.65) (= level "Advanced"))
+      ;; Candidate is totally new to this domain; we drop "Advanced" courses
+      (and (> cv-dist 0.65) (= level "advanced"))
       false
       :else true)))
 
