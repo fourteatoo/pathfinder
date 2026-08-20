@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="slides-revealjs_files/libs/clipboard/clipboard.min.js"></script>
+<script src="slides-revealjs_files/libs/quarto-html/tabby.min.js"></script>
+<script src="slides-revealjs_files/libs/quarto-html/popper.min.js"></script>
+<script src="slides-revealjs_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="slides-revealjs_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="slides-revealjs_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="slides-revealjs_files/libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.18">
+
+  <title>Pathfinder</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="slides-revealjs_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="slides-revealjs_files/libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="slides-revealjs_files/libs/revealjs/dist/theme/quarto-2740581606dc327e82f18f789b69d8a0.css">
+  <link href="slides-revealjs_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="slides-revealjs_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="slides-revealjs_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="slides-revealjs_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+
+<section class="slide level2">
+
+<style></style>
+<style>.printedClojure .sourceCode {
+  background-color: transparent;
+  border-style: none;
+}
+</style>
+<style>.clay-limit-image-width .clay-image {max-width: 100%}
+.clay-side-by-side .sourceCode {margin: 0}
+.clay-side-by-side {margin: 1em 0}
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" type="text/javascript"></script>
+<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.20.0/plotly.min.js" type="text/javascript"></script>
+<style>
+   /* 1. Force container to scroll horizontally instead of clipping/stacking */
+   .clay-dataset, .kind-table, div.table-wrapper, .table-responsive {
+     overflow-x: auto !important;
+     max-width: 100% !important;
+   }
+
+   /* 2. Set hard character boundaries on table cells */
+   table th, table td {
+     max-width: 80ch !important;        /* Cap width at roughly 80 characters */
+     min-width: 10ch !important;        /* Prevent tiny squeezed columns */
+     white-space: normal !important;    /* Allow text inside cell to wrap */
+     word-break: break-word !important; /* Break long unbroken strings/urls */
+     vertical-align: top !important;
+   }
+
+   /* 3. Keep empty or small cells compact */
+   table {
+     border-collapse: collapse !important;
+     width: max-content !important;      /* Prevent table from shrinking to container */
+   }
+ </style>
+<style>
+  /* Limit maximum height of Mermaid diagrams in slides */
+  .reveal .mermaid svg {
+    max-height: 480px !important;
+    width: auto !important;
+  }
+</style>
+<div style="align-items:center;display:flex;height:550px;justify-content:space-between;width:100%;"><div style="flex:1;text-align:left;"><h1>Pathfinder</h1><p>Exploring New Horizons</p></div><div style="flex:0 0 400px;"><div class="clay-image"><p><img alt="" src="slides-revealjs_files/image0.png"></p></div></div></div>
+</section>
+<section>
+<section id="the-problem" class="title-slide slide level1 center">
+<h1>The Problem</h1>
+<p>What do you do when you are looking for a new job? A quick visit to Indeed, LinkedIn, or other professional platform usually is the start.</p>
+</section>
+<section class="slide level2">
+
+<p>But that’s just the start.</p>
+<div style="bottom:0;margin:0 auto;position:absolute;right:0;width:700px;"><div class="clay-image"><p><img alt="" src="slides-revealjs_files/image1.png"></p></div></div>
+</section>
+<section class="slide level2">
+
+<p>Then comes the offer decoding, the profile tweaking, the application, etc. And that’s when you are the perfect fit for the job. But what about when you aren’t?</p>
+<p>Enter Pathfinder.</p>
+<div style="margin:0 auto;position:absolute;right:0;"><div class="clay-image"><p><img alt="" src="slides-revealjs_files/image2.png"></p></div></div>
+</section></section>
+<section>
+<section id="project-overview" class="title-slide slide level1 center">
+<h1>Project Overview</h1>
+<p>The Career Pathfinder Engine is a data-driven decision system. Its goal is to bridge the gap between a job seeker’s current profile, market offer, statistical realities, and targeted educational opportunities.</p>
+</section>
+<section id="how-it-works" class="slide level2">
+<h2>How it works</h2>
+<p>Unlike naive job search engines, Pathfinder uses:</p>
+<ul>
+<li class="fragment">Semantic job matches (no regex, keywords, etc)</li>
+<li class="fragment">Semantic course matches (ditto)</li>
+<li class="fragment">Semantic rating in relation to skills</li>
+<li class="fragment">GenAI for CV tailoring</li>
+<li class="fragment">Market metadata (where available)</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<div class="clay-image">
+<p><img data-src="slides-revealjs_files/image3.jpg"></p>
+</div>
+</section></section>
+<section>
+<section id="the-market" class="title-slide slide level1 center">
+<h1>The Market</h1>
+<p>Why do we serve market data?</p>
+<p>Course recommendations based on semantic similarity alone don’t give the entire picture. We want to know how a course can potentially transform our life, in the context of what the market offers and the community’s opinion.</p>
+</section>
+<section id="segmentation" class="slide level2">
+<h2>Segmentation</h2>
+<p>The StackOverflow’s survey covers a whole lot of technologies across several countries. We take care of extracting a picture of a localised reality as to avoid bunching together wildly different data groups.</p>
+</section>
+<section id="for-germany" class="slide level2">
+<h2>For Germany:</h2>
+<div style="height:auto;width:100%;"><script>Plotly.newPlot(document.currentScript.parentElement, [{"x":[1218,1298,1310,1213,981,527,405,429,528,1263,440,536,728,617,1051,462,553,470,735,559,1407,523,589,965,478,453,748,416,737,549],"y":[0.5591133004926108,0.5755007704160247,0.4755725190839695,0.5869744435284419,0.708460754332314,0.6641366223908918,1.061728395061728,0.4149184149184149,0.4053030303030303,0.6215360253365004,0.575,0.6100746268656716,0.506868131868132,0.4116693679092382,0.7925784966698382,0.7186147186147186,0.5081374321880651,0.4531914893617021,0.7401360544217687,0.5635062611806798,0.6851457000710732,0.6080305927342256,0.9066213921901528,0.4746113989637306,0.4728033472803347,0.5408388520971302,0.4598930481283422,0.7259615384615385,0.55359565807327,0.6320582877959927],"text":["Bash\/Shell (all shells)","HTML\/CSS","JavaScript","SQL","TypeScript","C#","Go","PHP","PowerShell","Python","C","C++","Java","MySQL","PostgreSQL","Redis","MariaDB","Microsoft SQL Server","SQLite","Amazon Web Services (AWS)","Docker","Homebrew","Kubernetes","npm","Make","Microsoft Azure","Pip","Vite","Node.js","React"],"mode":"markers+text","textposition":"top center","type":"scatter","marker":{"size":12,"color":[87011.0,81210.0,81210.0,83531.0,82370.0,78890.0,90491.0,74249.0,81210.0,85851.0,83531.0,83531.0,84691.0,80050.0,87011.0,92812.0,76570.0,78890.0,83000.0,96292.0,85851.0,92812.0,92812.0,83531.0,87011.0,87011.0,85851.0,80050.0,81210.0,84691.0],"colorscale":"Viridis","showscale":true,"colorbar":{"title":"Median Salary ($)"}}}], {"title":"2025 Developer Market Dynamics","xaxis":{"title":"Market Footprint (Have Worked With)"},"yaxis":{"title":"Desirability Ratio (Want \/ Have)"},"width":800,"height":500,"hovermode":"closest"}, {});</script></div>
+</section>
+<section id="for-usa" class="slide level2">
+<h2>For USA:</h2>
+<div style="height:auto;width:100%;"><script>Plotly.newPlot(document.currentScript.parentElement, [{"x":[1669,1130,3475,3178,2845,1046,1394,3207,2315,3190,1485,1001,1575,1429,2274,1519,1259,2310,1010,1245,2900,1427,1323,1100,2384,1782,974,950,975,933,960,1855,1764],"y":[0.6650689035350509,0.6353982300884956,0.4474820143884892,0.6217747010698553,0.5096660808435852,0.6338432122370937,0.4347202295552367,0.5718740255690677,0.6799136069114471,0.4968652037617555,0.3481481481481481,1.196803196803197,0.4577777777777778,0.4128761371588523,0.8007915567282322,0.7103357472021066,0.6735504368546466,0.5761904761904763,0.5623762376237624,0.5477911646586345,0.6393103448275862,0.5494043447792571,0.7596371882086168,0.4572727272727273,0.3968120805369128,0.3967452300785634,0.7114989733059548,0.6873684210526316,0.5076923076923077,0.6559485530546624,0.3010416666666667,0.5029649595687332,0.5901360544217688],"text":["C#","C++","JavaScript","Python","Bash\/Shell (all shells)","C","Java","SQL","TypeScript","HTML\/CSS","PowerShell","Go","Microsoft SQL Server","MySQL","PostgreSQL","SQLite","Redis","Amazon Web Services (AWS)","Google Cloud","Microsoft Azure","Docker","Homebrew","Kubernetes","Make","npm","Pip","Terraform","Vite","NuGet","ASP.NET Core","jQuery","Node.js","React"],"mode":"markers+text","textposition":"top center","type":"scatter","marker":{"size":12,"color":[140000.0,150000.0,150000.0,157000.0,158000.0,149000.0,159000.0,150000.0,160000.0,148000.0,140000.0,180000.0,138000.0,146000.0,165000.0,150000.0,175000.0,170000.0,175000.0,150000.0,163000.0,175000.0,180000.0,170000.0,159000.0,165000.0,185000.0,155000.0,145000.0,140000.0,135000.0,155000.0,160000.0],"colorscale":"Viridis","showscale":true,"colorbar":{"title":"Median Salary ($)"}}}], {"title":"2025 Developer Market Dynamics","xaxis":{"title":"Market Footprint (Have Worked With)"},"yaxis":{"title":"Desirability Ratio (Want \/ Have)"},"width":800,"height":500,"hovermode":"closest"}, {});</script></div>
+</section>
+<section class="slide level2">
+
+<p>Which exposes the typical IT conundrum that sees fun techonology as the least in demand (by employers) and the most adopted technology among the least desirable (by developers).</p>
+</section>
+<section id="the-pay-gap" class="slide level2">
+<h2>The Pay Gap</h2>
+<p>How the StackOverflow’s survey distribute income across the the regions</p>
+<div style="height:auto;width:100%;"><script>Plotly.newPlot(document.currentScript.parentElement, [{"type":"scattergeo","lon":[-73.9249,13.3833,72.8775,-0.1275,2.3522,-79.3733,30.5236,19.1667,4.8833,12.4828,-46.6339,151.21,-3.7033,18.0547,8.5411,null,16.3725,26.0978,4.3333,12.5689,34.78,28.9603,-99.1359,-8.6108,113.26,174.7653,24.9375,28.0416,23.7281,23.3217,67.01,10.7389,19.0408,-58.3819,90.3944,-6.2603,-74.0817,37.6175,3.3936,139.7514,106.8269,20.4569,51.3897,36.8172,17.1128,106.7019,120.9772,31.2358,-70.65,100.5167,121.3143,15.9772,25.28,79.8606,55.3094,103.8,85.32,101.6953,14.5061,114.1586,24.745,-77.0375,24.1069,-7.62,-56.1913,3.0586,126.99,44.7925,-66.9144,10.18,-1.625,33.365,126.99,38.7525,46.71,-90.5133,35.9333,18.4131,76.915,32.5811,-79.8875,-84.0796,-70.7,27.5618,44.5144,6.1328,19.8181,-57.6344,21.4317,35.5131,14.5125,-68.1333,49.8352,44.2,96.1561,69.2797,19.2628,30.115,-21.935,28.2833,69.1658,44.3661,30.8,9.7,-89.1912,36.2919,104.921,57.55,-87.2047,47.525,-4.4775,-79.5347,74.5667],"lat":[40.6943,52.5167,19.0758,51.5072,48.8567,43.7417,50.45,50.3,52.3667,41.8931,-23.5504,-33.8678,40.4169,59.3275,47.3744,null,48.2083,44.4134,50.8333,55.6761,32.08,41.01,19.3538,41.15,23.13,-36.8492,60.1708,-26.2044,37.9842,42.6979,24.86,59.9133,47.4983,-34.5997,23.7289,53.3497,4.6097,55.7506,6.4561,35.685,-6.1753,44.8178,35.6889,-1.2864,48.1447,10.7756,14.5958,30.0444,-33.4375,13.75,24.9913,45.8131,54.6872,6.9267,25.2697,1.3,27.71,3.1478,46.0514,22.2783,59.4372,-12.06,56.9475,33.5992,-34.9059,36.7764,37.56,41.7225,10.5061,36.8008,6.7,35.1725,37.56,9.0358,24.65,14.6417,31.95,43.8564,43.24,0.3136,-2.19,9.9327,19.45,53.9022,40.1814,49.6106,41.3283,-25.28,41.9961,33.8869,35.8978,-16.4958,40.3667,15.35,16.8053,41.3111,42.4414,-1.9525,64.1475,-15.4167,34.5328,33.3153,-17.6667,4.05,13.6976,33.5131,11.5696,-20.3333,14.1058,-18.91,54.15,8.9711,42.8667],"text":["United States\n (7233 surveyed, \nmedian salary = 150000.0)","Germany\n (3025 surveyed, \nmedian salary = 81210.0)","India\n (2547 surveyed, \nmedian salary = 17203.0)","United Kingdom\n (2042 surveyed, \nmedian salary = 94618.0)","France\n (1409 surveyed, \nmedian salary = 63228.0)","Canada\n (1305 surveyed, \nmedian salary = 87550.0)","Ukraine\n (964 surveyed, \nmedian salary = 25021.0)","Poland\n (888 surveyed, \nmedian salary = 60038.0)","Netherlands\n (867 surveyed, \nmedian salary = 81210.0)","Italy\n (835 surveyed, \nmedian salary = 47566.0)","Brazil\n (825 surveyed, \nmedian salary = 27306.0)","Australia\n (804 surveyed, \nmedian salary = 97514.0)","Spain\n (717 surveyed, \nmedian salary = 62648.0)","Sweden\n (616 surveyed, \nmedian salary = 70440.0)","Switzerland\n (546 surveyed, \nmedian salary = 142592.0)","Chzechia\n (520 surveyed, \nmedian salary = 60660.0)","Austria\n (410 surveyed, \nmedian salary = 78890.0)","Romania\n (323 surveyed, \nmedian salary = 57437.0)","Belgium\n (321 surveyed, \nmedian salary = 69609.0)","Denmark\n (316 surveyed, \nmedian salary = 98756.0)","Israel\n (297 surveyed, \nmedian salary = 141188.0)","Turkey\n (295 surveyed, \nmedian salary = 30000.0)","Mexico\n (286 surveyed, \nmedian salary = 28951.0)","Portugal\n (280 surveyed, \nmedian salary = 61488.0)","China\n (255 surveyed, \nmedian salary = 34125.0)","New Zealand\n (255 surveyed, \nmedian salary = 81318.0)","Finland\n (254 surveyed, \nmedian salary = 74249.0)","South Africa\n (253 surveyed, \nmedian salary = 43412.0)","Greece\n (252 surveyed, \nmedian salary = 44666.0)","Bulgaria\n (244 surveyed, \nmedian salary = 50411.0)","Pakistan\n (239 surveyed, \nmedian salary = 6321.0)","Norway\n (237 surveyed, \nmedian salary = 88945.0)","Hungary\n (236 surveyed, \nmedian salary = 46266.0)","Argentina\n (222 surveyed, \nmedian salary = 40000.0)","Bangladesh\n (220 surveyed, \nmedian salary = 7936.0)","Ireland\n (209 surveyed, \nmedian salary = 116015.0)","Colombia\n (202 surveyed, \nmedian salary = 20500.0)","Russia\n (200 surveyed, \nmedian salary = 38278.0)","Nigeria\n (199 surveyed, \nmedian salary = 1291.0)","Japan\n (188 surveyed, \nmedian salary = 58725.0)","Indonesia\n (181 surveyed, \nmedian salary = 5638.0)","Serbia\n (158 surveyed, \nmedian salary = 48000.0)","Iran\n (149 surveyed, \nmedian salary = 18516.0)","Kenya\n (148 surveyed, \nmedian salary = 6502.0)","Slovakia\n (147 surveyed, \nmedian salary = 55687.0)","Vietnam\n (145 surveyed, \nmedian salary = 7642.0)","Philippines\n (142 surveyed, \nmedian salary = 12291.0)","Egypt\n (140 surveyed, \nmedian salary = 7190.0)","Chile\n (131 surveyed, \nmedian salary = 33930.0)","Thailand\n (119 surveyed, \nmedian salary = 32123.0)","Taiwan\n (118 surveyed, \nmedian salary = 33886.0)","Croatia\n (113 surveyed, \nmedian salary = 46406.0)","Lithuania\n (101 surveyed, \nmedian salary = 66708.0)","Sri Lanka\n (95 surveyed, \nmedian salary = 10391.0)","United Arab Emirates\n (89 surveyed, \nmedian salary = 54460.0)","Singapore\n (89 surveyed, \nmedian salary = 93735.0)","Nepal\n (83 surveyed, \nmedian salary = 4060.0)","Malaysia\n (82 surveyed, \nmedian salary = 18850.0)","Slovenia\n (78 surveyed, \nmedian salary = 58007.0)","Hong Kong\n (72 surveyed, \nmedian salary = 76433.0)","Estonia\n (70 surveyed, \nmedian salary = 69609.0)","Peru\n (64 surveyed, \nmedian salary = 17000.0)","Latvia\n (62 surveyed, \nmedian salary = 52207.0)","Morocco\n (55 surveyed, \nmedian salary = 21987.0)","Uruguay\n (52 surveyed, \nmedian salary = 49338.0)","Algeria\n (49 surveyed, \nmedian salary = 6472.0)","Korea, South\n (48 surveyed, \nmedian salary = 33072.0)","Georgia\n (48 surveyed, \nmedian salary = 54000.0)","Venezuela\n (47 surveyed, \nmedian salary = 9000.0)","Tunisia\n (46 surveyed, \nmedian salary = 6517.0)","Ghana\n (46 surveyed, \nmedian salary = 2900.0)","Cyprus\n (39 surveyed, \nmedian salary = 92812.0)","Korea, South\n (38 surveyed, \nmedian salary = 44096.0)","Ethiopia\n (38 surveyed, \nmedian salary = 1000.0)","Saudi Arabia\n (37 surveyed, \nmedian salary = 38387.0)","Guatemala\n (33 surveyed, \nmedian salary = 29668.0)","Jordan\n (32 surveyed, \nmedian salary = 30000.0)","Bosnia and Herzegovina\n (30 surveyed, \nmedian salary = 47000.0)","Kazakhstan\n (29 surveyed, \nmedian salary = 28961.0)","Uganda\n (28 surveyed, \nmedian salary = 5005.0)","Ecuador\n (28 surveyed, \nmedian salary = 30000.0)","Costa Rica\n (27 surveyed, \nmedian salary = 65000.0)","Dominican Republic\n (26 surveyed, \nmedian salary = 30000.0)","Belarus\n (26 surveyed, \nmedian salary = 49200.0)","Armenia\n (25 surveyed, \nmedian salary = 9076.0)","Luxembourg\n (23 surveyed, \nmedian salary = 98612.0)","Albania\n (22 surveyed, \nmedian salary = 34804.0)","Paraguay\n (21 surveyed, \nmedian salary = 22000.0)","North Macedonia\n (20 surveyed, \nmedian salary = 29940.0)","Lebanon\n (20 surveyed, \nmedian salary = 47000.0)","Malta\n (19 surveyed, \nmedian salary = 70769.0)","Bolivia\n (18 surveyed, \nmedian salary = 18784.0)","Azerbaijan\n (18 surveyed, \nmedian salary = 29397.0)","Yemen\n (18 surveyed, \nmedian salary = 9891.0)","Burma\n (17 surveyed, \nmedian salary = 5716.0)","Uzbekistan\n (16 surveyed, \nmedian salary = 9675.0)","Montenegro\n (15 surveyed, \nmedian salary = 45246.0)","Rwanda\n (15 surveyed, \nmedian salary = 17324.0)","Iceland\n (13 surveyed, \nmedian salary = 117637.0)","Zambia\n (13 surveyed, \nmedian salary = 3078.0)","Afghanistan\n (13 surveyed, \nmedian salary = 7042.0)","Iraq\n (13 surveyed, \nmedian salary = 18000.0)","Zimbabwe\n (13 surveyed, \nmedian salary = 20000.0)","Cameroon\n (13 surveyed, \nmedian salary = 2000.0)","El Salvador\n (12 surveyed, \nmedian salary = 27000.0)","Syria\n (11 surveyed, \nmedian salary = 12000.0)","Cambodia\n (11 surveyed, \nmedian salary = 1500.0)","Mauritius\n (11 surveyed, \nmedian salary = 15976.0)","Honduras\n (11 surveyed, \nmedian salary = 12000.0)","Madagascar\n (11 surveyed, \nmedian salary = 7200.0)","Isle of Man\n (10 surveyed, \nmedian salary = 83632.0)","Panama\n (10 surveyed, \nmedian salary = 26400.0)","Kyrgyzstan\n (10 surveyed, \nmedian salary = 13751.0)"],"mode":"markers","marker":{"size":[30.0,21.52082129978925,20.24185243731032,18.752046216363556,16.59272031944921,16.194296597560704,14.761743319540432,14.409273781051404,14.309244875079045,14.154460754393257,14.10548457112374,14.001658890634731,13.556341671788315,13.00393916538648,12.593990703430718,12.435076008499987,11.714048700423264,11.071696659850588,11.0559704307973,11.016439171961444,10.863290742674245,10.84688836629626,10.77238009585832,10.72205482200448,10.50632073719555,10.50632073719555,10.497476134484447,10.488614103934049,10.479734542114542,10.408054164599422,10.36265589829577,10.344363759457984,10.335188746556536,10.204636890525702,10.18565423425379,10.079671101975052,10.010769409569683,9.990864723878394,9.980875059340029,9.869286907123733,9.796568993985064,9.547158155903766,9.444650334504395,9.43307164515682,9.421453772091372,9.398098865853568,9.362762388788546,9.338996985774003,9.22988944315661,9.078403115311037,9.065441360413736,8.999792610002864,8.836042247282288,8.750513695846843,8.662238823567892,8.662238823567892,8.570934755372692,8.55540026417815,8.492294221249935,8.394518834327037,8.36102741100224,8.257574007242074,8.222019438648559,8.092827117126895,8.034949710316502,7.975377256336814,7.955116441195069,7.955116441195069,7.934643453561867,7.913951484805271,7.913951484805271,7.762318144557875,7.7395776028727274,7.7395776028727274,7.71653582257841,7.621096914224748,7.596345889551357,7.545655261254768,7.519676011662703,7.493244847371514,7.493244847371514,7.466337330896302,7.438926739538399,7.438926739538399,7.4109837545262955,7.353368073767869,7.323620087816994,7.293187971893948,7.2620222361074696,7.2620222361074696,7.230067119391545,7.197259417163519,7.197259417163519,7.197259417163519,7.163527011188499,7.128787003621037,7.092943316609912,7.092943316609912,7.017474855158251,7.017474855158251,7.017474855158251,7.017474855158251,7.017474855158251,7.017474855158251,6.977558220597535,6.93594073981013,6.93594073981013,6.93594073981013,6.93594073981013,6.93594073981013,6.892384481159802,6.892384481159802,6.892384481159802],"color":[150000.0,81210.0,17203.0,94618.0,63228.0,87550.0,25021.0,60038.0,81210.0,47566.0,27306.0,97514.0,62648.0,70440.0,142592.0,60660.0,78890.0,57437.0,69609.0,98756.0,141188.0,30000.0,28951.0,61488.0,34125.0,81318.0,74249.0,43412.0,44666.0,50411.0,6321.0,88945.0,46266.0,40000.0,7936.0,116015.0,20500.0,38278.0,1291.0,58725.0,5638.0,48000.0,18516.0,6502.0,55687.0,7642.0,12291.0,7190.0,33930.0,32123.0,33886.0,46406.0,66708.0,10391.0,54460.0,93735.0,4060.0,18850.0,58007.0,76433.0,69609.0,17000.0,52207.0,21987.0,49338.0,6472.0,33072.0,54000.0,9000.0,6517.0,2900.0,92812.0,44096.0,1000.0,38387.0,29668.0,30000.0,47000.0,28961.0,5005.0,30000.0,65000.0,30000.0,49200.0,9076.0,98612.0,34804.0,22000.0,29940.0,47000.0,70769.0,18784.0,29397.0,9891.0,5716.0,9675.0,45246.0,17324.0,117637.0,3078.0,7042.0,18000.0,20000.0,2000.0,27000.0,12000.0,1500.0,15976.0,12000.0,7200.0,83632.0,26400.0,13751.0],"colorscale":"Viridis","colorbar":{"title":"Median Salary (USD)"},"showscale":true,"line":{"width":1,"color":"white"}}}], {"title":"Global Distribution and Average Salary of Surveyed","width":900,"height":550,"geo":{"projection":{"type":"natural earth"},"showland":true,"landcolor":"rgb(243, 243, 243)","countrycolor":"rgb(210, 210, 210)","showcountries":true}}, {});</script></div>
+</section></section>
+<section id="resources" class="title-slide slide level1 center">
+<h1>Resources</h1>
+<p>GitHub repo at https://github.com/fourteatoo/pathfinder</p>
+<p>GitHub Pages at https://fourteatoo.github.io/pathfinder</p>
+<div style="text-align: center;">
+<p><img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&amp;data=https://github.com/fourteatoo/pathfinder" alt="Scan to view repo" style="width: 250px; height: 250px;"></p>
+</div>
+<div style="background-color:grey;height:2px;width:100%;"></div>
+<div><pre><small><small>source: notebooks/slides.clj</small></small></pre></div>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="slides-revealjs_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="slides-revealjs_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="slides-revealjs_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="slides-revealjs_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="slides-revealjs_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="slides-revealjs_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="slides-revealjs_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="slides-revealjs_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="slides-revealjs_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="slides-revealjs_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'h.v',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'default',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'slide',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
