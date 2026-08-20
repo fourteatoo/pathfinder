@@ -13,7 +13,7 @@ online courses, market data and logistic constraints.
 The app, although self-contained, is conceptually split between a
 backend written in Clojure and a frontend written in ClojureScript.
 
-The ultimate scope of this project is to showcase the use of text
+The ultimate scope of this project is to showcase the use of vector
 embeddings and GenAI applied to a modern problem.
 
 A notebook (Clay) and a couple of slides are included in the
