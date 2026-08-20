@@ -2,10 +2,11 @@
 (ns slides
   {:clay {:quarto-target-path "docs"
           :quarto {:format {:revealjs {:theme "default"
-                                       :slide-number true}
+                                       :slide-number true
+                                       :pagetitle "Pathfinder"
+                                       :title-slide false}
                             ;; Add pptx configs here
-                            :pptx {}}}
-          :title "Pathfinder"}}
+                            :pptx {}}}}}
   (:require
    [fourteatoo.pathfinder.jdbc :as jdbc]
    [fourteatoo.pathfinder.trends :as trends]
@@ -17,13 +18,10 @@
 
 
 ^:kindly/hide-code
-(comment
-;; Thoughout the slides we use stuff that needs the DB.  And we do so
-;; at load time!  So all the namespaces need to be intitialised now.
-  )
-
-^:kindly/hide-code
- (def started (mount/start))
+(def started
+  ;; Throughout the slides we use stuff that needs the DB.  And we do so
+  ;; at load time!  So all the namespaces need to be intitialised now.
+  (mount/start))
 
 ^:kindly/hide-code
 (defn make-slides []
@@ -105,7 +103,39 @@
     (jdbc/execute-one (str "select count(*) from " table)))))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+^:kindly/hide-code
+(kind/hiccup
+ [:div {:style {:display "flex"
+                :justify-content "space-between"
+                :align-items "center"
+                :width "100%"
+                :height "550px"}}
+  [:div {:style {:flex "1" :text-align "left"}}
+   [:h1 #_{:style {:font-size "3.5em" :margin "0"}} "Pathfinder"]
+   [:p #_{:style {:font-size "1.5em" :opacity "0.8"}} "Exploring New Horizons"]]
+  [:div {:style {:flex "0 0 400px"}}
+   (kind/image "resources/public/images/compass-big.png"
+               {:style {:width "400px"
+                        :height "auto"
+                        :display "block"}})]])
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+#_
+^:kindly/hide-code
+(kind/hiccup
+   [:div {:style {:position "absolute"
+                  :bottom 0
+                  :right 0
+                  :margin "0 auto"}}
+    (kind/image "resources/public/images/compass-big.png"
+                {:style {:width "300px"
+                         :height "auto"
+                         :display "block"
+                         :margin "0 auto"}})])
 
 ;; # The Problem
 ;;
